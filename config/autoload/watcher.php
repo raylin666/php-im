@@ -9,9 +9,14 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+use Hyperf\Watcher\Driver\ScanFileDriver;
 
-include 'routes/websocket.php';
-
-include 'routes/http.php';
-
-
+return [
+    'driver' => ScanFileDriver::class,
+    'bin' => 'php',
+    'watch' => [
+        'dir' => ['app', 'config'],
+        'file' => ['.env'],
+        'scan_interval' => 2000,
+    ],
+];

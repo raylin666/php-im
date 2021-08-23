@@ -17,20 +17,22 @@ return [
     'mode' => SWOOLE_PROCESS,
     'servers' => [
         [
-            'name' => 'http',
-            'type' => Server::SERVER_HTTP,
+            'name' => 'websocket',
+            'type' => Server::SERVER_WEBSOCKET,
             'host' => '0.0.0.0',
-            'port' => 9501,
+            'port' => 10000,
             'sock_type' => SWOOLE_SOCK_TCP,
             'callbacks' => [
-                Event::ON_REQUEST => [Hyperf\HttpServer\Server::class, 'onRequest'],
+                Event::ON_HAND_SHAKE => [App\Server\WebSocket::class, 'onHandShake'],
+                Event::ON_MESSAGE => [App\Server\WebSocket::class, 'onMessage'],
+                Event::ON_CLOSE => [App\Server\WebSocket::class, 'onClose'],
             ],
         ],
     ],
     'settings' => [
         Constant::OPTION_ENABLE_COROUTINE => true,
         Constant::OPTION_WORKER_NUM => swoole_cpu_num(),
-        Constant::OPTION_PID_FILE => BASE_PATH . '/runtime/hyperf.pid',
+        Constant::OPTION_PID_FILE => BASE_PATH . '/runtime/micro-im.pid',
         Constant::OPTION_OPEN_TCP_NODELAY => true,
         Constant::OPTION_MAX_COROUTINE => 100000,
         Constant::OPTION_OPEN_HTTP2_PROTOCOL => true,

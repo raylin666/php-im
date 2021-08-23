@@ -9,9 +9,8 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+use Hyperf\HttpServer\Router\Router;
 
-include 'routes/websocket.php';
-
-include 'routes/http.php';
-
-
+Router::addServer('websocket', function () {
+    Router::get('/', 'App\Controller\Websocket\WebSocketController');
+});
