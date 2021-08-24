@@ -5,13 +5,17 @@ declare(strict_types=1);
  * This file is part of Hyperf.
  *
  * @link     https://www.hyperf.io
- * @document https://hyperf.wiki
+ * @document https://doc.hyperf.io
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+namespace App\Exception;
 
-include 'routes/http.php';
-include 'routes/websocket.php';
+/**
+ * Class RuntimeException
+ * @package App\Exception
+ */
+class RuntimeException extends BusinessException
+{
 
-
-
+}

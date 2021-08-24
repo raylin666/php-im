@@ -31,6 +31,7 @@
         "hyperf/process": "~2.2.0",
         "hyperf/redis": "~2.2.0",
         "hyperf/tracer": "~2.2.0",
+        "hyperf/validation": "^2.2",
         "hyperf/websocket-server": "^2.2"
     },
     "require-dev": {

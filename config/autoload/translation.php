@@ -10,8 +10,7 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 return [
-    'http' => [
-        // 数组内配置您的全局中间件，顺序根据该数组的顺序
-        Hyperf\Validation\Middleware\ValidationMiddleware::class
-    ],
+    'locale' => 'zh_CN',
+    'fallback_locale' => 'en',
+    'path' => BASE_PATH . '/storage/languages',
 ];

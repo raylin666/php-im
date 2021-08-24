@@ -9,5 +9,11 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
+/**
+ * 替换某个类的实现
+ */
+
 return [
+    Hyperf\HttpServer\Contract\ResponseInterface::class => App\Dependencies\Response::class,
 ];
