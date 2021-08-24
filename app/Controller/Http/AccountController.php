@@ -13,6 +13,7 @@ namespace App\Controller\Http;
 
 use App\Controller\AbstractController;
 use App\Request\Account\AccountRequest;
+use App\Services\Account\AccountService;
 
 /**
  * 账号模块
@@ -24,10 +25,18 @@ class AccountController extends AbstractController
 
     }
 
+    /**
+     * 添加账号
+     * @param AccountRequest $request
+     * @return mixed
+     */
     public function add(AccountRequest $request)
     {
-        $validated = $request->validated();
-        return $this->response->RESTfulAPI($validated);
+        $data = $request->validated();
+
+        return $this->response->RESTfulAPI(
+            AccountService::getInstance()->add($data)
+        );
     }
 
     public function edit()
