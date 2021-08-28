@@ -4,6 +4,7 @@
 ini_set('display_errors', 'on');
 ini_set('display_startup_errors', 'on');
 ini_set('memory_limit', '1G');
+ini_set('date.timezone','Asia/Shanghai');
 
 error_reporting(E_ALL);
 

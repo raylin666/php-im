@@ -19,7 +19,7 @@ class HeadersHelper extends Helper
      */
     protected function getAccountId(): int
     {
-        return defined('ACCOUNT_TOKEN') ? ACCOUNT_TOKEN : 0;
+        return defined('ACCOUNT_ID') ? ACCOUNT_ID : 0;
     }
 
     /**

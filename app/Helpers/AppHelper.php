@@ -17,6 +17,7 @@ use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
 use Hyperf\Redis\Redis;
 use Hyperf\Utils\ApplicationContext;
+use Phper666\JWTAuth\JWT;
 use Swoole\Server;
 
 class AppHelper extends Helper
@@ -82,5 +83,13 @@ class AppHelper extends Helper
     protected function getIMTable()
     {
         return $this->getContainer()->get(IMTable::class);
+    }
+
+    /**
+     * @return false|mixed|null|JWT
+     */
+    protected function getJWT()
+    {
+        return $this->getRequest()->JWT;
     }
 }
