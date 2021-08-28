@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Services\Account;
 
+use App\Helpers\AppHelper;
 use App\Services\Service;
 
 /**
@@ -22,6 +23,8 @@ class AccountService extends Service
 {
     public function add(array $data)
     {
-
+        foreach (AppHelper::getIMTable()->get() as $row) {
+            var_dump($row);
+        }
     }
 }

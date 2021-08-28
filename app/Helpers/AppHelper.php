@@ -11,11 +11,13 @@ declare(strict_types=1);
  */
 namespace App\Helpers;
 
+use App\Swoole\Table\IMTable;
 use Hyperf\DbConnection\Db;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
 use Hyperf\Redis\Redis;
 use Hyperf\Utils\ApplicationContext;
+use Swoole\Server;
 
 class AppHelper extends Helper
 {
@@ -50,7 +52,7 @@ class AppHelper extends Helper
      * 获取 DB 服务
      * @return Db|mixed
      */
-    protected function getDB()
+    protected function getDb()
     {
         return $this->getContainer()->get(Db::class);
     }
@@ -62,5 +64,23 @@ class AppHelper extends Helper
     protected function getRedis()
     {
         return $this->getContainer()->get(Redis::class);
+    }
+
+    /**
+     * 获取 Swoole Server
+     * @return mixed|Server
+     */
+    protected function getServer()
+    {
+        return $this->getContainer()->get(Server::class);
+    }
+
+    /**
+     * 获取 IM Table 表
+     * @return IMTable|mixed
+     */
+    protected function getIMTable()
+    {
+        return $this->getContainer()->get(IMTable::class);
     }
 }

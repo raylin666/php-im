@@ -33,9 +33,9 @@ return [
             'port' => 10001,
             'sock_type' => SWOOLE_SOCK_TCP,
             'callbacks' => [
-                Event::ON_HAND_SHAKE => [App\Server\WebSocket::class, 'onHandShake'],
-                Event::ON_MESSAGE => [App\Server\WebSocket::class, 'onMessage'],
-                Event::ON_CLOSE => [App\Server\WebSocket::class, 'onClose'],
+                Event::ON_HAND_SHAKE => [App\Swoole\WebSocket\WebSocket::class, 'onHandShake'],
+                Event::ON_MESSAGE => [App\Swoole\WebSocket\WebSocket::class, 'onMessage'],
+                Event::ON_CLOSE => [App\Swoole\WebSocket\WebSocket::class, 'onClose'],
             ],
         ],
     ],
@@ -54,5 +54,6 @@ return [
         Event::ON_WORKER_START => [Hyperf\Framework\Bootstrap\WorkerStartCallback::class, 'onWorkerStart'],
         Event::ON_PIPE_MESSAGE => [Hyperf\Framework\Bootstrap\PipeMessageCallback::class, 'onPipeMessage'],
         Event::ON_WORKER_EXIT => [Hyperf\Framework\Bootstrap\WorkerExitCallback::class, 'onWorkerExit'],
+        Event::ON_BEFORE_START => [App\Swoole\Tcp\ServerStartCallback::class, 'beforeStart'],
     ],
 ];

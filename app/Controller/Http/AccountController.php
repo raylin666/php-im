@@ -22,7 +22,9 @@ class AccountController extends AbstractController
 {
     public function info()
     {
-
+        return $this->response->RESTfulAPI(
+            AccountService::getInstance()->add([])
+        );
     }
 
     /**

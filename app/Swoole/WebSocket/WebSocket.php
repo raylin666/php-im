@@ -9,7 +9,7 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
-namespace App\Server;
+namespace App\Swoole\Websocket;
 
 use Hyperf\Contract\ConfigInterface;
 use Hyperf\Contract\MiddlewareInitializerInterface;
@@ -164,7 +164,7 @@ class WebSocket implements MiddlewareInitializerInterface, OnHandShakeInterface,
             $security = $this->container->get(Security::class);
 
             $psr7Request = $this->initRequest($request);
-            $psr7Response = $this->initResponse();
+            $this->initResponse();
 
             $this->logger->debug(sprintf('WebSocket: fd[%d] start a handshake request.', $fd));
 
