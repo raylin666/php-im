@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Dependencies;
 
 use App\Exception\RuntimeException;
-use App\Constants\ErrorCode;
+use App\Constants\HttpErrorCode;
 use App\Helpers\AppHelper;
 use Hyperf\HttpMessage\Stream\SwooleStream;
 use Hyperf\HttpServer\Response as HttpServerResponse;
@@ -26,7 +26,7 @@ class Response extends HttpServerResponse
      * @param null  $message
      * @return object|\Psr\Http\Message\ResponseInterface
      */
-    public function RESTfulAPI($data = null, $status = ErrorCode::HTTP_OK, array $headers = [], $message = null)
+    public function RESTfulAPI($data = null, $status = HttpErrorCode::HTTP_OK, array $headers = [], $message = null)
     {
         $status = (int) $status;
 
@@ -35,13 +35,13 @@ class Response extends HttpServerResponse
 
         $data = $this->toJson([
             'code'              =>      $status,
-            'message'           =>      is_null($message) ? ErrorCode::getMessage($status) : $message,
+            'message'           =>      is_null($message) ? HttpErrorCode::getMessage($status) : $message,
             'response_time'     =>      $endResponseTime,
             'data'              =>      $data,
         ]);
 
         // Http 状态码 > 100 || < 600
-        $httpStatus = ($status < 100 || $status >= 600) ? ErrorCode::HTTP_OK : $status;
+        $httpStatus = ($status < 100 || $status >= 600) ? HttpErrorCode::HTTP_OK : $status;
 
         $response = $this->getResponse()
                     ->withStatus($httpStatus)
@@ -65,7 +65,7 @@ class Response extends HttpServerResponse
     {
         throw new RuntimeException(
             $code,
-            $msg ? : ErrorCode::getMessage($code)
+            $msg ? : HttpErrorCode::getMessage($code)
         );
     }
 

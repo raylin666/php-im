@@ -17,6 +17,5 @@ return [
     ],
     'websocket' => [
         App\Middleware\JWTMiddleware::class,
-        App\Middleware\WebSocketMiddleware::class,
     ],
 ];

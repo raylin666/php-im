@@ -18,7 +18,7 @@ use Hyperf\Constants\Annotation\Constants;
  * @method $this getMessage($code)
  * @Constants
  */
-class ErrorCode extends AbstractConstants
+class HttpErrorCode extends AbstractConstants
 {
     /**
      * @Message("Continue")
