@@ -15,6 +15,13 @@ use App\Contract\MessageInterface;
 
 class MessageStruct implements MessageInterface
 {
+    // 文本消息
+    const MESSAGE_TYPE_TEXT = 'text';
+    // 图片消息
+    const MESSAGE_TYPE_IMAGE = 'image';
+    // 语音消息
+    const MESSAGE_TYPE_VOICE = 'voice';
+
     protected $messageType;
 
     protected $messageData;

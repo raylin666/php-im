@@ -39,4 +39,19 @@ class WebSocketErrorCode extends AbstractConstants
      * @Message("Authorization account verification failed. Please ensure the normal authorization account")
      */
     const WS_AUTHORIZATION_ACCOUNT_VERIFICATION_FAILED = 10002;
+
+    /**
+     * @Message("Message data parsing failed")
+     */
+    const WS_MESSAGE_RESOLVE_ERROR = 20001;
+
+    /**
+     * @Message("Message format error")
+     */
+    const WS_MESSAGE_FORMAT_ERROR = 20002;
+
+    /**
+     * @Message("Unsupported message type")
+     */
+    const WS_UNSUPPORTED_MESSAGE_TYPE = 20003;
 }

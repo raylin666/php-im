@@ -11,7 +11,9 @@ declare(strict_types=1);
  */
 namespace App\Helpers;
 
+use App\Constants\MessageDefinition\Message;
 use App\Constants\MessageDefinition\MessageStruct;
+use App\Constants\MessageDefinition\TextMessage;
 use App\Constants\WebSocketErrorCode;
 use App\Contract\MessageDefinitionInterface;
 use App\Contract\MessageInterface;
@@ -19,11 +21,47 @@ use App\Contract\MessageInterface;
 class WebsocketHelper extends Helper
 {
     /**
+     * 获取/设置 消息结构体
      * @return MessageInterface
      */
     protected function getMessageStruct(): MessageInterface
     {
         return AppHelper::getContainer()->get(MessageStruct::class);
+    }
+
+    /**
+     * 消息内容解析
+     * @param        $fd
+     * @param string $data
+     * @return \App\Constants\MessageDefinition\Message|TextMessage|void
+     */
+    protected function resolveMessage($fd, string $data)
+    {
+        $data = json_decode($data, true);
+        if (json_last_error() || empty($data)) {
+            $this->pushMessage($fd, null, WebSocketErrorCode::WS_MESSAGE_RESOLVE_ERROR, null, true);
+            return;
+        }
+
+        $messageType = $data[Message::MESSAGE_TYPE] ?? '';
+        $messageData = $data[Message::MESSAGE_DATA] ?? '';
+        if (empty($messageType) || empty($messageData)) {
+            $this->pushMessage($fd, null, WebSocketErrorCode::WS_MESSAGE_FORMAT_ERROR, null, true);
+            return;
+        }
+
+        switch ($messageType) {
+            case MessageStruct::MESSAGE_TYPE_TEXT:
+                $messageStruct = TextMessage::withMessageContent(
+                    $messageData[TextMessage::MESSAGE_DATA_CONTENT] ?? ''
+                );
+                break;
+            default:
+                $this->pushMessage($fd, null, WebSocketErrorCode::WS_UNSUPPORTED_MESSAGE_TYPE, null, true);
+                return;
+        }
+
+        return $messageStruct;
     }
 
     /**
@@ -34,7 +72,7 @@ class WebsocketHelper extends Helper
      * @param null                            $message
      * @param bool                            $isClose
      */
-    protected function push(
+    protected function pushMessage(
         $fd,
         ?MessageDefinitionInterface $definition,
         $code = WebSocketErrorCode::WS_SUCCESS,
@@ -45,7 +83,6 @@ class WebsocketHelper extends Helper
         $code = intval($code);
 
         $server = AppHelper::getServer();
-
         $server->push(
             $fd,
             json_encode([

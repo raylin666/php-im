@@ -40,12 +40,12 @@ class OnOpen implements OnOpenInterface
         $authorization_secret = $request->header['authorization-secret'] ?? '';
 
         if (! ($authorization_id = Authorization::getAuthorizationId($authorization_key, $authorization_secret))) {
-            WebsocketHelper::push($fd, null, WebSocketErrorCode::WS_ACCOUNT_NOT_AUTHORIZED, null, true);
+            WebsocketHelper::pushMessage($fd, null, WebSocketErrorCode::WS_ACCOUNT_NOT_AUTHORIZED, null, true);
             return;
         }
 
         if (strlen($account_token) <= 0) {
-            goto VALID_RESULT;
+            goto GOTO_VALID_RESULT;
         }
 
         // 校验 Token 的有效性
@@ -54,27 +54,27 @@ class OnOpen implements OnOpenInterface
                 throw new RuntimeException('Token verification failed.');
             }
         } catch (Throwable $e) {
-            goto VALID_RESULT;
+            goto GOTO_VALID_RESULT;
         }
 
         // 解析 Token
         $parserData = AppHelper::getJWt()->getParserData($account_token);
         if ((! isset($parserData['account_id'])) || (! isset($parserData['authorization_id']))) {
-            goto VALID_RESULT;
+            goto GOTO_VALID_RESULT;
         }
 
         if (! ($account_id = Account::getAccountId($parserData['authorization_id'], $parserData['account_id']))) {
-            goto VALID_RESULT;
+            goto GOTO_VALID_RESULT;
         }
 
         if (AccountAuthorization::isNormalAccountAuthorization($account_id, $parserData['authorization_id'], $account_token)) {
             $isSuccessToken = true;
         }
 
-VALID_RESULT:
+GOTO_VALID_RESULT:
 
         if (! $isSuccessToken) {
-            WebsocketHelper::push($fd, null, WebSocketErrorCode::WS_AUTHORIZATION_ACCOUNT_VERIFICATION_FAILED, null, true);
+            WebsocketHelper::pushMessage($fd, null, WebSocketErrorCode::WS_AUTHORIZATION_ACCOUNT_VERIFICATION_FAILED, null, true);
             return;
         }
 

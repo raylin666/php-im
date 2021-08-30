@@ -19,6 +19,8 @@ use App\Helpers\WebsocketHelper;
  */
 class TextMessage extends Message
 {
+    const MESSAGE_DATA_CONTENT = 'content';
+
     /**
      * 消息内容
      * @var string
@@ -32,7 +34,7 @@ class TextMessage extends Message
     {
         // TODO: Implement getMessageType() method.
 
-        return 'text';
+        return MessageStruct::MESSAGE_TYPE_TEXT;
     }
 
     /**
@@ -65,7 +67,7 @@ class TextMessage extends Message
         return WebsocketHelper::getMessageStruct()
             ->withMessageType($this->getMessageType())
             ->withMessageData([
-                'content' => $this->getMessageContent()
+                self::MESSAGE_DATA_CONTENT => $this->getMessageContent()
             ]);
     }
 }

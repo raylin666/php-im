@@ -17,6 +17,9 @@ use Hyperf\Utils\ApplicationContext;
 
 abstract class Message implements MessageDefinitionInterface
 {
+    const MESSAGE_TYPE = 'message_type';
+    const MESSAGE_DATA = 'message_data';
+
     /**
      * @return array
      */
@@ -27,8 +30,8 @@ abstract class Message implements MessageDefinitionInterface
         $message = $this->toMessage();
 
         return [
-            'message_type' => $message->getMessageType(),
-            'message_data' => $message->getMessageData(),
+            self::MESSAGE_TYPE => $message->getMessageType(),
+            self::MESSAGE_DATA => $message->getMessageData(),
         ];
     }
 
