@@ -23,8 +23,6 @@ class AccountService extends Service
 {
     public function add(array $data)
     {
-        foreach (AppHelper::getIMTable()->get() as $row) {
-            var_dump($row);
-        }
+
     }
 }

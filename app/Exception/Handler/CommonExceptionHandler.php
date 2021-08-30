@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Exception\Handler;
 
+use App\Exception\AccountAuthorizationException;
 use App\Exception\RuntimeException;
 use App\Helpers\AppHelper;
 use Hyperf\ExceptionHandler\ExceptionHandler;
@@ -27,10 +28,12 @@ class CommonExceptionHandler extends ExceptionHandler
     public function handle(Throwable $throwable, ResponseInterface $response)
     {
         // 判断被捕获到的异常是希望被捕获的异常
-        if ($throwable instanceof RuntimeException) {
-            // 阻止异常冒泡
-            $this->stopPropagation();
-            return AppHelper::getResponse()->RESTfulAPI(null, $throwable->getCode(), [], $throwable->getMessage());
+        switch (get_class($throwable)) {
+            case RuntimeException::class:
+            case AccountAuthorizationException::class:
+                // 阻止异常冒泡
+                $this->stopPropagation();
+                return AppHelper::getResponse()->RESTfulAPI(null, $throwable->getCode(), [], $throwable->getMessage());
         }
 
         return $response;

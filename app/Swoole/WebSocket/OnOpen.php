@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Swoole\Websocket;
 
+use App\Constants\Common;
 use Throwable;
 use RuntimeException;
 use App\Constants\WebSocketErrorCode;
@@ -35,9 +36,9 @@ class OnOpen implements OnOpenInterface
         $fd = $request->fd;
 
         $isSuccessToken = false;
-        $account_token = $request->header['account-token'] ?? '';
-        $authorization_key = $request->header['authorization-key'] ?? '';
-        $authorization_secret = $request->header['authorization-secret'] ?? '';
+        $account_token = $request->header[Common::REQUEST_HEADERS_ACCOUNT_TOKEN] ?? '';
+        $authorization_key = $request->header[Common::REQUEST_HEADERS_AUTHORIZATION_KEY] ?? '';
+        $authorization_secret = $request->header[Common::REQUEST_HEADERS_AUTHORIZATION_SECRET] ?? '';
 
         if (! ($authorization_id = Authorization::getAuthorizationId($authorization_key, $authorization_secret))) {
             WebsocketHelper::pushMessage($fd, null, WebSocketErrorCode::WS_ACCOUNT_NOT_AUTHORIZED, null, true);

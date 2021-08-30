@@ -319,4 +319,9 @@ class HttpErrorCode extends AbstractConstants
      * @Message("Network Authentication Required")
      */
     const HTTP_NETWORK_AUTHENTICATION_REQUIRED = 511;
+
+    /**
+     * @Message("Account not authorized")
+     */
+    const AUTHORIZATION_ACCOUNT_VERIFICATION_FAILED = 10001;
 }
