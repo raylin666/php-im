@@ -18,6 +18,7 @@ use Hyperf\HttpServer\Contract\ResponseInterface;
 use Hyperf\Redis\Redis;
 use Hyperf\Utils\ApplicationContext;
 use Phper666\JWTAuth\JWT;
+use Psr\Http\Message\ServerRequestInterface;
 use Swoole\Server;
 
 class AppHelper extends Helper
@@ -38,6 +39,15 @@ class AppHelper extends Helper
     protected function getRequest()
     {
         return $this->getContainer()->get(RequestInterface::class);
+    }
+
+    /**
+     * 获取服务请求类
+     * @return mixed|ServerRequestInterface
+     */
+    protected function getServerRequest()
+    {
+        return $this->getContainer()->get(ServerRequestInterface::class);
     }
 
     /**
@@ -91,5 +101,13 @@ class AppHelper extends Helper
     protected function getJWT()
     {
         return $this->getRequest()->JWT;
+    }
+
+    /**
+     * @return int
+     */
+    protected function getAuthorizationId(): int
+    {
+        return intval($this->getServerRequest()->authorization_id);
     }
 }

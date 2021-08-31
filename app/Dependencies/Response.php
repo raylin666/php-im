@@ -61,7 +61,7 @@ class Response extends HttpServerResponse
      * @param        $code
      * @param string $msg
      */
-    public static function error($code, $msg = '')
+    public function error($code, $msg = '')
     {
         throw new RuntimeException(
             $code,
@@ -74,7 +74,7 @@ class Response extends HttpServerResponse
      * @param $data
      * @return mixed
      */
-    public static function success($data)
+    public function success($data = [])
     {
         return $data;
     }

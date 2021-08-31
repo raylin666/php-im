@@ -324,4 +324,14 @@ class HttpErrorCode extends AbstractConstants
      * @Message("Account not authorized")
      */
     const AUTHORIZATION_ACCOUNT_VERIFICATION_FAILED = 10001;
+
+    /**
+     * @Message("Account already exists")
+     */
+    const ACCOUNT_ALREADY_EXISTS = 10002;
+
+    /**
+     * @Message("Failed to add user account")
+     */
+    const ACCOUNT_ADD_ERROR = 10003;
 }

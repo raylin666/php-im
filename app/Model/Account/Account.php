@@ -4,6 +4,7 @@ declare (strict_types=1);
 namespace App\Model\Account;
 
 use App\Model\Model;
+use Carbon\Carbon;
 
 /**
  * @property int $id 
@@ -33,7 +34,7 @@ class Account extends Model
      *
      * @var array
      */
-    protected $casts = ['id' => 'integer', 'authorization_id' => 'integer', 'state' => 'integer', 'created_at' => 'datetime'];
+    protected $casts = ['id' => 'integer', 'authorization_id' => 'integer', 'uid' => 'integer', 'state' => 'integer', 'created_at' => 'datetime'];
 
     /**
      * @var string[]
@@ -66,5 +67,70 @@ class Account extends Model
 
         return intval($builder->where(['authorization_id' => $authorization_id, 'state' => self::STATE_OPEN])
             ->value('id'));
+    }
+
+    /**
+     * 通过应用ID 获取账号ID
+     * @param $uid
+     * @param $authorization_id
+     * @return int
+     */
+    protected function getUidByAccountId($uid, $authorization_id): int
+    {
+        return intval($this->where(['uid' => $uid, 'authorization_id' => $authorization_id])
+            ->value('id'));
+    }
+
+    /**
+     * 账号是否可用
+     * @param $account_id
+     * @return bool
+     */
+    protected function isAccountAvailable($account_id): bool
+    {
+        return $this->where(['id' => $account_id, 'state' => self::STATE_OPEN])->exists();
+    }
+
+    /**
+     * 添加用户账号
+     * @param $authorization_id
+     * @param $uid
+     * @param $username
+     * @param $avatar
+     * @return bool
+     */
+    protected function addAccount($authorization_id, $uid, $username, $avatar): bool
+    {
+        return $this->insert([
+            'authorization_id' => $authorization_id,
+            'uid' => $uid,
+            'username' => $username,
+            'avatar' => $avatar,
+            'state' => self::STATE_OPEN,
+            'created_at' => Carbon::now(),
+            'deleted_at' => null,
+        ]);
+    }
+
+    /**
+     * 重置用户账号
+     * @param $account_id
+     * @param $authorization_id
+     * @param $uid
+     * @param $username
+     * @param $avatar
+     * @return int
+     */
+    protected function resetAccount($account_id, $authorization_id, $uid, $username, $avatar): int
+    {
+        return $this->where(['id' => $account_id])->update([
+            'authorization_id' => $authorization_id,
+            'uid' => $uid,
+            'username' => $username,
+            'avatar' => $avatar,
+            'state' => self::STATE_OPEN,
+            'created_at' => Carbon::now(),
+            'deleted_at' => null,
+        ]);
     }
 }

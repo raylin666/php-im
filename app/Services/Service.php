@@ -11,6 +11,9 @@ declare(strict_types=1);
  */
 namespace App\Services;
 
+use App\Dependencies\Response;
+use App\Helpers\AppHelper;
+
 /**
  * Class Service
  * @package App\Services
@@ -33,5 +36,13 @@ abstract class Service
         }
 
         return self::$instance[$className];
+    }
+
+    /**
+     * @return \Hyperf\HttpServer\Contract\ResponseInterface|Response|mixed
+     */
+    protected function response()
+    {
+        return AppHelper::getResponse();
     }
 }

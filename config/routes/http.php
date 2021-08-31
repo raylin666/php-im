@@ -17,15 +17,15 @@ Router::get('/favicon.ico', function () {
 });
 
 /**
- * 账号模块
+ * 用户账号模块
  */
 Router::addGroup('/account', function () {
-    // 获取账号信息
+    // 获取用户账号信息
     Router::get('/{account_id}/info', 'App\Controller\Http\AccountController@info');
-    // 添加账号
+    // 添加用户账号
     Router::put('/add', 'App\Controller\Http\AccountController@add');
-    // 修改账号
+    // 修改用户账号
     Router::post('/{account_id}/edit', 'App\Controller\Http\AccountController@edit');
-    // 删除账号
+    // 删除用户账号
     Router::delete('/{account_id}/delete', 'App\Controller\Http\AccountController@delete');
 });

@@ -26,7 +26,7 @@ class AccountController extends AbstractController
     }
 
     /**
-     * 添加账号
+     * 添加用户账号
      * @param AccountRequest $request
      * @return mixed
      */

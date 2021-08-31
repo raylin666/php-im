@@ -22,6 +22,7 @@ class AccountRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'uid' => 'required|numeric',
             'username' => 'required|min:1|max:20',
             'avatar' => 'required|url',
         ];
