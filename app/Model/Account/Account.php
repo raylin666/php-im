@@ -42,6 +42,11 @@ class Account extends Model
     protected $hidden = ['deleted_at'];
 
     /**
+     * @var bool
+     */
+    public $timestamps = false;
+
+    /**
      * 账号状态
      */
     // 关闭
@@ -62,7 +67,7 @@ class Account extends Model
         $builder = $this;
 
         if ($account_id) {
-            $builder->where('id', $account_id);
+            $builder = $builder->where('id', $account_id);
         }
 
         return intval($builder->where(['authorization_id' => $authorization_id, 'state' => self::STATE_OPEN])

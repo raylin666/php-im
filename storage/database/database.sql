@@ -38,6 +38,6 @@ CREATE TABLE `im_account_authorization` (
     `updated_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     `deleted_at` datetime DEFAULT NULL COMMENT '删除时间',
     PRIMARY KEY (`id`),
-    KEY `un_account_authorization` (`account_id`, `authorization_id`)
+    UNIQUE KEY `uk_account_authorization` (`account_id`, `authorization_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户账号授权管理表';
 

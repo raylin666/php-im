@@ -12,6 +12,8 @@ declare(strict_types=1);
 namespace App\Swoole\Websocket;
 
 use App\Constants\Common;
+use App\Helpers\JWTHelper;
+use App\Repository\AchieveClass\AccountToken;
 use Throwable;
 use RuntimeException;
 use App\Constants\WebSocketErrorCode;
@@ -35,7 +37,7 @@ class OnOpen implements OnOpenInterface
 
         $fd = $request->fd;
 
-        $isSuccessToken = false;
+        $is_success_token = false;
         $account_token = $request->header[Common::REQUEST_HEADERS_ACCOUNT_TOKEN] ?? '';
         $authorization_key = $request->header[Common::REQUEST_HEADERS_AUTHORIZATION_KEY] ?? '';
         $authorization_secret = $request->header[Common::REQUEST_HEADERS_AUTHORIZATION_SECRET] ?? '';
@@ -51,7 +53,7 @@ class OnOpen implements OnOpenInterface
 
         // 校验 Token 的有效性
         try {
-            if (! AppHelper::getJWT()->checkToken($account_token)) {
+            if (! JWTHelper::get()->checkToken($account_token)) {
                 throw new RuntimeException('Token verification failed.');
             }
         } catch (Throwable $e) {
@@ -59,28 +61,34 @@ class OnOpen implements OnOpenInterface
         }
 
         // 解析 Token
-        $parserData = AppHelper::getJWt()->getParserData($account_token);
-        if ((! isset($parserData['account_id'])) || (! isset($parserData['authorization_id']))) {
+        $parserData = JWTHelper::get()->getParserData($account_token);
+        if ((! isset($parserData[AccountToken::ACCOUNT_ID])) || (! isset($parserData[AccountToken::AUTHORIZATION_ID]))) {
             goto GOTO_VALID_RESULT;
         }
 
-        if (! ($account_id = Account::getAccountId($parserData['authorization_id'], $parserData['account_id']))) {
+        if (! ($account_id = Account::getAccountId($parserData[AccountToken::AUTHORIZATION_ID], $parserData[AccountToken::ACCOUNT_ID]))) {
             goto GOTO_VALID_RESULT;
         }
 
-        if (AccountAuthorization::isNormalAccountAuthorization($account_id, $parserData['authorization_id'], $account_token)) {
-            $isSuccessToken = true;
+        if (AccountAuthorization::isNormalAccountAuthorization($account_id, $parserData[AccountToken::AUTHORIZATION_ID], $account_token)) {
+            $is_success_token = true;
         }
 
 GOTO_VALID_RESULT:
 
-        if (! $isSuccessToken) {
+        if (! $is_success_token) {
             WebsocketHelper::pushMessage($fd, null, WebSocketErrorCode::WS_AUTHORIZATION_ACCOUNT_VERIFICATION_FAILED, null, true);
             return;
         }
 
+        // Token 解析内容数据保存
+        AppHelper::getAccountToken()
+            ->withAccountId($account_id)
+            ->withAuthorizationId($authorization_id);
+
         // 创建 fd -> account 绑定关系
-        AppHelper::getIMTable()->withFd($fd)
+        AppHelper::getIMTable()
+            ->withFd($fd)
             ->withAccountId($account_id)
             ->withAuthorizationId($authorization_id)
             ->withData('')

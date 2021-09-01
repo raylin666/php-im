@@ -334,4 +334,9 @@ class HttpErrorCode extends AbstractConstants
      * @Message("Failed to add user account")
      */
     const ACCOUNT_ADD_ERROR = 10003;
+
+    /**
+     * @Message("Account not available")
+     */
+    const ACCOUNT_NOT_AVAILABLE = 10004;
 }

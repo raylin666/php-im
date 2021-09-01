@@ -3,6 +3,8 @@
 declare (strict_types=1);
 namespace App\Model\Account;
 
+use App\Helpers\AppHelper;
+use App\Helpers\JWTHelper;
 use App\Model\Model;
 use Carbon\Carbon;
 
@@ -61,5 +63,70 @@ class AccountAuthorization extends Model
         return $builder->where('expired_at', '>', Carbon::now())
             ->whereNull('deleted_at')
             ->exists();
+    }
+
+    /**
+     * 获取用户账号授权信息
+     * @param $account_id
+     * @param $authorization_id
+     * @return \Hyperf\Database\Model\Builder|\Hyperf\Database\Model\Model|object|null
+     */
+    protected function getAccountAuthorization($account_id, $authorization_id)
+    {
+        return $this->where(['account_id' => $account_id, 'authorization_id' => $authorization_id])->first();
+    }
+
+    /**
+     * @param $account_id
+     * @param $authorization_id
+     * @return int
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     */
+    protected function createData($account_id, $authorization_id)
+    {
+        $token = JWTHelper::generateToken(
+            AppHelper::getAccountToken()
+                ->withAccountId($account_id)
+                ->withAuthorizationId($authorization_id)
+                ->toArray()
+        );
+
+        $token_ttl = JWTHelper::get()->getTTL($token);
+
+        return $this->insertGetId([
+            'account_id' => $account_id,
+            'authorization_id' => $authorization_id,
+            'token' => $token,
+            'ttl' => $token_ttl,
+            'expired_at' => Carbon::createFromTimestamp($token_ttl + time()),
+            'created_at' => Carbon::now(),
+        ]);
+    }
+
+    /**
+     * @param $account_id
+     * @param $authorization_id
+     * @return int
+     * @throws \Psr\SimpleCache\InvalidArgumentException
+     */
+    protected function updateTokenData($account_id, $authorization_id)
+    {
+        $token = JWTHelper::generateToken(
+            AppHelper::getAccountToken()
+                ->withAccountId($account_id)
+                ->withAuthorizationId($authorization_id)
+                ->toArray()
+        );
+
+        $token_ttl = JWTHelper::get()->getTTL($token);
+
+        return $this->where(['account_id' => $account_id, 'authorization_id' => $authorization_id])
+            ->update([
+                'token' => $token,
+                'ttl' => $token_ttl,
+                'expired_at' => Carbon::createFromTimestamp($token_ttl + time()),
+                'refresh_at' => Carbon::now(),
+                'deleted_at' => null,
+            ]);
     }
 }

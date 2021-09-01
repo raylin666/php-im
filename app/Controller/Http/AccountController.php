@@ -26,6 +26,18 @@ class AccountController extends AbstractController
     }
 
     /**
+     * 获取用户账号 Token
+     * @param $account_id
+     * @return mixed
+     */
+    public function accountToken($account_id)
+    {
+        return $this->response->RESTfulAPI(
+            AccountService::getInstance()->accountToken($account_id)
+        );
+    }
+
+    /**
      * 添加用户账号
      * @param AccountRequest $request
      * @return mixed

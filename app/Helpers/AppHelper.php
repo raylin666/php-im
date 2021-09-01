@@ -11,13 +11,13 @@ declare(strict_types=1);
  */
 namespace App\Helpers;
 
+use App\Repository\AchieveClass\AccountToken;
 use App\Swoole\Table\IMTable;
 use Hyperf\DbConnection\Db;
 use Hyperf\HttpServer\Contract\RequestInterface;
 use Hyperf\HttpServer\Contract\ResponseInterface;
 use Hyperf\Redis\Redis;
 use Hyperf\Utils\ApplicationContext;
-use Phper666\JWTAuth\JWT;
 use Psr\Http\Message\ServerRequestInterface;
 use Swoole\Server;
 
@@ -96,11 +96,11 @@ class AppHelper extends Helper
     }
 
     /**
-     * @return false|mixed|null|JWT
+     * @return AccountToken|mixed
      */
-    protected function getJWT()
+    protected function getAccountToken()
     {
-        return $this->getRequest()->JWT;
+        return $this->getContainer()->get(AccountToken::class);
     }
 
     /**

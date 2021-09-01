@@ -22,6 +22,8 @@ Router::get('/favicon.ico', function () {
 Router::addGroup('/account', function () {
     // 获取用户账号信息
     Router::get('/{account_id}/info', 'App\Controller\Http\AccountController@info');
+    // 获取用户账号 Token
+    Router::get('/{account_id}/account-token', 'App\Controller\Http\AccountController@accountToken');
     // 添加用户账号
     Router::put('/add', 'App\Controller\Http\AccountController@add');
     // 修改用户账号
