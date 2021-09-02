@@ -145,4 +145,36 @@ class AccountAuthorization extends Model
             'refresh_at' => $accountAuthorization['refresh_at'],
         ];
     }
+
+    /**
+     * @param $account_id
+     * @param $authorization_id
+     * @return bool
+     */
+    protected function setOnline($account_id, $authorization_id): bool
+    {
+        $this->where(['account_id' => $account_id, 'authorization_id' => $authorization_id])
+            ->update([
+                'is_online' => 1,
+                'onlined_at' => Carbon::now(),
+            ]);
+
+        return true;
+    }
+
+    /**
+     * @param $account_id
+     * @param $authorization_id
+     * @return bool
+     */
+    protected function setOffline($account_id, $authorization_id): bool
+    {
+        $this->where(['account_id' => $account_id, 'authorization_id' => $authorization_id])
+            ->update([
+                'is_online' => 0,
+                'offlined_at' => Carbon::now(),
+            ]);
+
+        return true;
+    }
 }

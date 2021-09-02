@@ -46,10 +46,7 @@ class AccountService extends Service
     public function accountToken($account_id)
     {
         $authorization_id = AppHelper::getAuthorizationId();
-        $account = Account::getAccount($account_id);
-        if (! $account) {
-            return $this->response()->error(HttpErrorCode::ACCOUNT_NOT_AVAILABLE);
-        }
+        $account = $this->verifyAccountOrGet($account_id, $authorization_id);
 
         $account_authorization_func = function ($account_id, $authorization_id) {
             return AccountAuthorization::getAccountAuthorization($account_id, $authorization_id);

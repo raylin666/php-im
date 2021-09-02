@@ -93,5 +93,8 @@ GOTO_VALID_RESULT:
             ->withAuthorizationId($authorization_id)
             ->withData('')
             ->bind($fd);
+
+        // 设置用户在线状态
+        AccountAuthorization::setOnline($account_id, $authorization_id);
     }
 }

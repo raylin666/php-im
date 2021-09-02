@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace App\Swoole\Websocket;
 
 use App\Helpers\AppHelper;
+use App\Model\Account\AccountAuthorization;
 use Hyperf\Contract\OnCloseInterface;
 
 class OnClose implements OnCloseInterface
@@ -25,8 +26,13 @@ class OnClose implements OnCloseInterface
     {
         // TODO: Implement onClose() method.
 
+        $fd_info = AppHelper::getIMTable()->getInfo($fd);
+
         // 删除 fd -> account 绑定关系
         AppHelper::getIMTable()->unbind($fd);
+
+        // 设置用户离线状态
+        AccountAuthorization::setOffline($fd_info['account_id'], $fd_info['authorization_id']);
 
         $server->push($fd, 'bye!');
     }

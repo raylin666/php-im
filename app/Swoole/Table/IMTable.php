@@ -79,7 +79,7 @@ class IMTable
         }
 
         if (! $table->create()) {
-            throw new \Exception('创建 IM Table 表失败');
+            throw new \Exception('Failed to create im table');
         }
 
         $this->set($table);
@@ -126,6 +126,16 @@ class IMTable
     public function unbind($key): bool
     {
         return $this->get()->del(strval($key));
+    }
+
+    /**
+     * 获取 fd 信息
+     * @param $fd
+     * @return mixed
+     */
+    public function getInfo($fd)
+    {
+        return $this->get()->get(strval($fd));
     }
 
     /**
