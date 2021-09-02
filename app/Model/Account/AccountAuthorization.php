@@ -147,6 +147,7 @@ class AccountAuthorization extends Model
     }
 
     /**
+     * 设置用户账号授权为在线
      * @param $account_id
      * @param $authorization_id
      * @return bool
@@ -163,6 +164,7 @@ class AccountAuthorization extends Model
     }
 
     /**
+     * 设置用户账号授权为离线
      * @param $account_id
      * @param $authorization_id
      * @return bool
@@ -176,5 +178,19 @@ class AccountAuthorization extends Model
             ]);
 
         return true;
+    }
+
+    /**
+     * 用户账号授权是否在线
+     * @param $account_id
+     * @param $authorization_id
+     * @return bool
+     */
+    protected function isOnline($account_id, $authorization_id): bool
+    {
+        return $this->where(['account_id' => $account_id, 'authorization_id' => $authorization_id, 'is_online' => 1])
+            ->where('expired_at', '>', Carbon::now())
+            ->whereNull('deleted_at')
+            ->exists();
     }
 }
