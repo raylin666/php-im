@@ -6,6 +6,7 @@ namespace App\Model\Account;
 use App\Helpers\AppHelper;
 use App\Helpers\JWTHelper;
 use App\Model\Model;
+use App\Swoole\Table\IMTable;
 use Carbon\Carbon;
 
 /**
@@ -188,9 +189,12 @@ class AccountAuthorization extends Model
      */
     protected function isOnline($account_id, $authorization_id): bool
     {
-        return $this->where(['account_id' => $account_id, 'authorization_id' => $authorization_id, 'is_online' => 1])
-            ->where('expired_at', '>', Carbon::now())
-            ->whereNull('deleted_at')
-            ->exists();
+        foreach (AppHelper::getIMTable()->get() as $row) {
+            if (($row[IMTable::CONLUMN_ACCOUNT_ID] == $account_id) && ($row[IMTable::COLUMN_AUTHORIZATION_ID] == $authorization_id)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

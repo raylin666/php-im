@@ -17,6 +17,7 @@ use App\Constants\MessageDefinition\TextMessage;
 use App\Constants\WebSocketErrorCode;
 use App\Contract\MessageDefinitionInterface;
 use App\Contract\MessageInterface;
+use App\Swoole\Table\IMTable;
 
 class WebsocketHelper extends Helper
 {
@@ -27,6 +28,24 @@ class WebsocketHelper extends Helper
     protected function getMessageStruct(): MessageInterface
     {
         return AppHelper::getContainer()->get(MessageStruct::class);
+    }
+
+    /**
+     * 获取用户账号授权的所有 fd
+     * @param $account_id
+     * @param $authorization_id
+     * @return array
+     */
+    protected function getAccountAuthorizationFd($account_id, $authorization_id): array
+    {
+        $fds = [];
+        foreach (AppHelper::getIMTable()->get() as $row) {
+            if (($row[IMTable::CONLUMN_ACCOUNT_ID] == $account_id) && ($row[IMTable::COLUMN_AUTHORIZATION_ID] == $authorization_id)) {
+                $fds[] = $row[IMTable::COLUMN_FD];
+            }
+        }
+
+        return $fds;
     }
 
     /**
