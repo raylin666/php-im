@@ -339,4 +339,9 @@ class HttpErrorCode extends AbstractConstants
      * @Message("Account not available")
      */
     const ACCOUNT_NOT_AVAILABLE = 10004;
+
+    /**
+     * @Message("Account uid cannot be modified")
+     */
+    const ACCOUNT_UID_CANNOT_BE_MODIFIED = 10005;
 }

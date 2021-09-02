@@ -26,6 +26,18 @@ use Carbon\Carbon;
 class AccountService extends Service
 {
     /**
+     * 获取用户账号信息
+     * @param $account_id
+     * @return array|void
+     */
+    public function info($account_id)
+    {
+        $authorization_id = AppHelper::getAuthorizationId();
+        $account = $this->verifyAccountOrGet($account_id, $authorization_id);
+        return Account::builderAccount($account);
+    }
+
+    /**
      * 获取用户账号 Token
      * @param $account_id
      * @return array|mixed|void
@@ -34,7 +46,8 @@ class AccountService extends Service
     public function accountToken($account_id)
     {
         $authorization_id = AppHelper::getAuthorizationId();
-        if (! Account::getAccountId($authorization_id, $account_id)) {
+        $account = Account::getAccount($account_id);
+        if (! $account) {
             return $this->response()->error(HttpErrorCode::ACCOUNT_NOT_AVAILABLE);
         }
 
@@ -64,14 +77,14 @@ class AccountService extends Service
             $account_authorization = $account_authorization_func($account_id, $authorization_id);
         }
 
-        return $this->response()->success([
-            'id' => $account_authorization['id'],
-            'account_id' => $account_authorization['account_id'],
-            'authorization_id' => $account_authorization['authorization_id'],
-            'token' => $account_authorization['token'],
-            'expired_at' => $account_authorization['expired_at'],
-            'refresh_at' => $account_authorization['refresh_at'],
-        ]);
+        return $this->response()->success(
+            array_merge(
+                AccountAuthorization::builderAccountAuthorization($account_authorization),
+                [
+                    'account' => Account::builderAccount($account),
+                ]
+            )
+        );
     }
 
     /**
@@ -81,6 +94,8 @@ class AccountService extends Service
      */
     public function add(array $data)
     {
+        $data['uid'] = intval($data['uid']);
+
         $is_add = false;
         $authorization_id = AppHelper::getAuthorizationId();
         if ($account_id = Account::getUidByAccountId($data['uid'], $authorization_id)) {
@@ -98,10 +113,86 @@ class AccountService extends Service
         }
 
         // 新增账号信息
-        if ((! $is_add) && (! Account::addAccount($authorization_id, $data['uid'], $data['username'], $data['avatar']))) {
+        if ((! $is_add) && (! ($account_id = Account::addAccount($authorization_id, $data['uid'], $data['username'], $data['avatar'])))) {
             return $this->response()->error(HttpErrorCode::ACCOUNT_ADD_ERROR);
         }
 
+        return $this->response()->success([
+            'id' => $account_id,
+            'uid' => $data['uid'],
+            'username' => $data['username'],
+            'avatar' => $data['avatar'],
+        ]);
+    }
+
+    /**
+     * 修改用户账号
+     * @param       $account_id
+     * @param array $data
+     * @return array|mixed|void
+     */
+    public function edit($account_id, array $data)
+    {
+        $authorization_id = AppHelper::getAuthorizationId();
+        $account = $this->verifyAccountOrGet($account_id, $authorization_id);
+        // 必须保证修改的数据 在业务层内 uid 相同
+        if ($account['uid'] != $data['uid']) {
+            return $this->response()->error(HttpErrorCode::ACCOUNT_UID_CANNOT_BE_MODIFIED);
+        }
+
+        Account::where(['id' => $account_id])->update([
+            'username' => $data['username'],
+            'avatar' => $data['avatar'],
+        ]);
+
         return $this->response()->success();
+    }
+
+    /**
+     * 删除用户账号
+     * @param $account_id
+     * @return array|mixed|void
+     */
+    public function delete($account_id)
+    {
+        $authorization_id = AppHelper::getAuthorizationId();
+        $this->verifyAccountOrGet($account_id, $authorization_id);
+
+        Account::where(['id' => $account_id])->update([
+            'state' => Account::STATE_DELETE,
+            'deleted_at' => Carbon::now(),
+        ]);
+
+        AccountAuthorization::where(['account_id' => $account_id, 'authorization_id' => $authorization_id])
+            ->whereNull('deleted_at')
+            ->update([
+                'deleted_at' => Carbon::now(),
+            ]);
+
+        return $this->response()->success();
+    }
+
+    /**
+     * 验证用户账号
+     * @param $account_id
+     * @param $authorization_id
+     * @return \Hyperf\Database\Model\Builder|\Hyperf\Database\Model\Model|object|void
+     */
+    private function verifyAccountOrGet($account_id, $authorization_id)
+    {
+        $account = Account::getAccount($account_id);
+        if (! $account) {
+            return $this->response()->error(HttpErrorCode::ACCOUNT_NOT_AVAILABLE);
+        }
+
+        if ($account['authorization_id'] != $authorization_id) {
+            return $this->response()->error(HttpErrorCode::AUTHORIZATION_ACCOUNT_VERIFICATION_FAILED);
+        }
+
+        if ($account['state'] != Account::STATE_OPEN) {
+            return $this->response()->error(HttpErrorCode::ACCOUNT_NOT_AVAILABLE);
+        }
+
+        return $account;
     }
 }

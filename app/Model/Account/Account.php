@@ -97,16 +97,26 @@ class Account extends Model
     }
 
     /**
+     * 获取账号信息
+     * @param $account_id
+     * @return \Hyperf\Database\Model\Builder|\Hyperf\Database\Model\Model|object|null
+     */
+    protected function getAccount($account_id)
+    {
+        return $this->where(['id' => $account_id])->first();
+    }
+
+    /**
      * 添加用户账号
      * @param $authorization_id
      * @param $uid
      * @param $username
      * @param $avatar
-     * @return bool
+     * @return int
      */
-    protected function addAccount($authorization_id, $uid, $username, $avatar): bool
+    protected function addAccount($authorization_id, $uid, $username, $avatar): int
     {
-        return $this->insert([
+        return $this->insertGetId([
             'authorization_id' => $authorization_id,
             'uid' => $uid,
             'username' => $username,
@@ -137,5 +147,21 @@ class Account extends Model
             'created_at' => Carbon::now(),
             'deleted_at' => null,
         ]);
+    }
+
+    /**
+     * @param Account $account
+     * @return array
+     */
+    protected function builderAccount(Account $account): array
+    {
+        return [
+            'id' => $account['id'],
+            'authorization_id' => $account['authorization_id'],
+            'uid' => $account['uid'],
+            'username' => $account['username'],
+            'avatar' => $account['avatar'],
+            'created_at' => $account['created_at'],
+        ];
     }
 }

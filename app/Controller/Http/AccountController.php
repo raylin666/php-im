@@ -20,9 +20,16 @@ use App\Services\Account\AccountService;
  */
 class AccountController extends AbstractController
 {
-    public function info()
+    /**
+     * 获取用户账号信息
+     * @param $account_id
+     * @return mixed
+     */
+    public function info($account_id)
     {
-        return $this->response->RESTfulAPI();
+        return $this->response->RESTfulAPI(
+            AccountService::getInstance()->info($account_id)
+        );
     }
 
     /**
@@ -51,13 +58,30 @@ class AccountController extends AbstractController
         );
     }
 
-    public function edit()
+    /**
+     * 修改用户账号
+     * @param                $account_id
+     * @param AccountRequest $request
+     * @return mixed
+     */
+    public function edit($account_id, AccountRequest $request)
     {
+        $data = $request->validated();
 
+        return $this->response->RESTfulAPI(
+            AccountService::getInstance()->edit($account_id, $data)
+        );
     }
 
-    public function delete()
+    /**
+     * 删除用户账号
+     * @param $account_id
+     * @return mixed
+     */
+    public function delete($account_id)
     {
-
+        return $this->response->RESTfulAPI(
+            AccountService::getInstance()->delete($account_id)
+        );
     }
 }

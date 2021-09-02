@@ -129,4 +129,20 @@ class AccountAuthorization extends Model
                 'deleted_at' => null,
             ]);
     }
+
+    /**
+     * @param AccountAuthorization $accountAuthorization
+     * @return array
+     */
+    protected function builderAccountAuthorization(AccountAuthorization $accountAuthorization)
+    {
+        return [
+            'id' => $accountAuthorization['id'],
+            'account_id' => $accountAuthorization['account_id'],
+            'authorization_id' => $accountAuthorization['authorization_id'],
+            'token' => $accountAuthorization['token'],
+            'expired_at' => $accountAuthorization['expired_at'],
+            'refresh_at' => $accountAuthorization['refresh_at'],
+        ];
+    }
 }
