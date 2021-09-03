@@ -41,6 +41,9 @@ abstract class Message implements MessageDefinitionInterface
         ];
     }
 
+    /**
+     * @return MessageInterface
+     */
     abstract protected function toMessage(): MessageInterface;
 
     /**
