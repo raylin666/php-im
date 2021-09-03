@@ -13,6 +13,7 @@ namespace App\Constants\MessageDefinition;
 
 use App\Contract\MessageDefinitionInterface;
 use App\Contract\MessageInterface;
+use App\Helpers\WebsocketHelper;
 use Hyperf\Utils\ApplicationContext;
 
 abstract class Message implements MessageDefinitionInterface
@@ -21,7 +22,40 @@ abstract class Message implements MessageDefinitionInterface
     const MESSAGE_DATA = 'message_data';
     const ROOM_TYPE = 'room_type';
     const ROOM_ID = 'room_id';
-    const TO_ACCOUNT_ID = 'account_id';
+    const TO_ACCOUNT_ID = 'to_account_id';
+
+    /**
+     * @var MessageInterface
+     */
+    protected $messageStruct;
+
+    /**
+     * @return MessageInterface
+     */
+    protected function getMessageStruct(): MessageInterface
+    {
+        if (! $this->messageStruct instanceof MessageInterface) {
+            $this->messageStruct = WebsocketHelper::getMessageStruct();
+        }
+
+        return $this->messageStruct;
+    }
+
+    /**
+     * @param string $roomType
+     * @param string $roomId
+     * @param int    $toAccountId
+     * @return MessageInterface
+     */
+    public function withBasicMessage(string $roomType, string $roomId = '', int $toAccountId = 0): self
+    {
+        $this->getMessageStruct()
+            ->withRoomType($roomType)
+            ->withRoomId($roomId)
+            ->withToAccountId($toAccountId);
+
+        return $this;
+    }
 
     /**
      * @return array
@@ -33,11 +67,11 @@ abstract class Message implements MessageDefinitionInterface
         $message = $this->toMessage();
 
         return [
-            self::MESSAGE_TYPE => $message->getMessageType(),
-            self::MESSAGE_DATA => $message->getMessageData(),
             self::ROOM_TYPE => $message->getRoomType(),
             self::ROOM_ID => $message->getRoomId(),
             self::TO_ACCOUNT_ID => $message->getToAccountId(),
+            self::MESSAGE_TYPE => $message->getMessageType(),
+            self::MESSAGE_DATA => $message->getMessageData(),
         ];
     }
 

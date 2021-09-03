@@ -70,7 +70,7 @@ class WebsocketHelper extends Helper
         $messageData = $data[Message::MESSAGE_DATA] ?? '';
         $roomType = $data[Message::ROOM_TYPE] ?? '';
         $roomId = $data[Message::ROOM_ID] ?? '';
-        $toAccountId = $data[Message::TO_ACCOUNT_ID] ?? 0;
+        $toAccountId = intval($data[Message::TO_ACCOUNT_ID] ?? 0);
         if (empty($messageType)
             || empty($messageData)
             || empty($roomType)
@@ -92,6 +92,8 @@ class WebsocketHelper extends Helper
                 $this->pushMessage($fd, null, WebSocketErrorCode::WS_UNSUPPORTED_MESSAGE_TYPE);
                 return;
         }
+
+        $messageStruct->withBasicMessage($roomType, $roomId, $toAccountId);
 
         return $messageStruct;
     }

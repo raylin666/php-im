@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace App\Constants\MessageDefinition;
 
 use App\Contract\MessageInterface;
-use App\Helpers\WebsocketHelper;
 
 /**
  * 文本消息类型
@@ -64,7 +63,7 @@ class TextMessage extends Message
     {
         // TODO: Implement toMessage() method.
 
-        return WebsocketHelper::getMessageStruct()
+        return $this->getMessageStruct()
             ->withMessageType($this->getMessageType())
             ->withMessageData([
                 self::MESSAGE_DATA_CONTENT => $this->getMessageContent()
