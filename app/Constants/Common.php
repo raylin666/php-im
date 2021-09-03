@@ -16,7 +16,10 @@ class Common
     /**
      * 请求头相关
      */
+    // 用户业务账号登录 Token 标识
     const REQUEST_HEADERS_ACCOUNT_TOKEN = 'account-token';
+    // 用户账号 APP-Key
     const REQUEST_HEADERS_AUTHORIZATION_KEY = 'authorization-key';
+    // 用户账号 APP-Secret
     const REQUEST_HEADERS_AUTHORIZATION_SECRET = 'authorization-secret';
 }

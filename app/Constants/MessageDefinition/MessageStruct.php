@@ -26,6 +26,12 @@ class MessageStruct implements MessageInterface
 
     protected $messageData;
 
+    protected $roomType;
+
+    protected $roomId;
+
+    protected $toAccountId;
+
     public function withMessageType(string $messageType): MessageInterface
     {
         // TODO: Implement withMessageType() method.
@@ -38,7 +44,7 @@ class MessageStruct implements MessageInterface
     {
         // TODO: Implement getMessageType() method.
 
-        return $this->messageType;
+        return strval($this->messageType);
     }
 
     public function withMessageData(array $messageData): MessageInterface
@@ -53,6 +59,51 @@ class MessageStruct implements MessageInterface
     {
         // TODO: Implement getMessageData() method.
 
-        return $this->messageData;
+        return is_array($this->messageData) ? $this->messageData : [];
+    }
+
+    public function withRoomType(string $roomType): MessageInterface
+    {
+        // TODO: Implement withRoomType() method.
+
+        $this->roomType = $roomType;
+        return $this;
+    }
+
+    public function getRoomType(): string
+    {
+        // TODO: Implement getRoomType() method.
+
+        return strval($this->roomType);
+    }
+
+    public function withRoomId(string $roomId): MessageInterface
+    {
+        // TODO: Implement withRoomId() method.
+
+        $this->roomId = $roomId;
+        return $this;
+    }
+
+    public function getRoomId(): string
+    {
+        // TODO: Implement getRoomId() method.
+
+        return strval($this->roomId);
+    }
+
+    public function withToAccountId(int $toAccountId): MessageInterface
+    {
+        // TODO: Implement withToAccountId() method.
+
+        $this->toAccountId = $toAccountId;
+        return $this;
+    }
+
+    public function getToAccountId(): int
+    {
+        // TODO: Implement getToAccountId() method.
+
+        return intval($this->toAccountId);
     }
 }

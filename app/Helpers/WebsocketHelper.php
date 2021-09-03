@@ -17,6 +17,8 @@ use App\Constants\MessageDefinition\TextMessage;
 use App\Constants\WebSocketErrorCode;
 use App\Contract\MessageDefinitionInterface;
 use App\Contract\MessageInterface;
+use App\Repository\AchieveClass\PushMessage;
+use App\Repository\AchieveClass\RoomType;
 use App\Swoole\Table\IMTable;
 
 class WebsocketHelper extends Helper
@@ -58,14 +60,25 @@ class WebsocketHelper extends Helper
     {
         $data = json_decode($data, true);
         if (json_last_error() || empty($data)) {
-            $this->pushMessage($fd, null, WebSocketErrorCode::WS_MESSAGE_RESOLVE_ERROR, null, true);
+            $this->pushMessage($fd, null, WebSocketErrorCode::WS_MESSAGE_RESOLVE_ERROR);
             return;
         }
 
+        $roomTypeInstance = AppHelper::getContainer()->get(RoomType::class);
+
         $messageType = $data[Message::MESSAGE_TYPE] ?? '';
         $messageData = $data[Message::MESSAGE_DATA] ?? '';
-        if (empty($messageType) || empty($messageData)) {
-            $this->pushMessage($fd, null, WebSocketErrorCode::WS_MESSAGE_FORMAT_ERROR, null, true);
+        $roomType = $data[Message::ROOM_TYPE] ?? '';
+        $roomId = $data[Message::ROOM_ID] ?? '';
+        $toAccountId = $data[Message::TO_ACCOUNT_ID] ?? 0;
+        if (empty($messageType)
+            || empty($messageData)
+            || empty($roomType)
+            || !in_array($roomType, $roomTypeInstance->toArray())
+            || (($roomType == $roomTypeInstance->getC2C()) && ($toAccountId <= 0))
+            || (($roomType == $roomTypeInstance->getGroup()) && empty($roomId))
+        ) {
+            $this->pushMessage($fd, null, WebSocketErrorCode::WS_MESSAGE_FORMAT_ERROR);
             return;
         }
 
@@ -76,7 +89,7 @@ class WebsocketHelper extends Helper
                 );
                 break;
             default:
-                $this->pushMessage($fd, null, WebSocketErrorCode::WS_UNSUPPORTED_MESSAGE_TYPE, null, true);
+                $this->pushMessage($fd, null, WebSocketErrorCode::WS_UNSUPPORTED_MESSAGE_TYPE);
                 return;
         }
 
@@ -101,16 +114,14 @@ class WebsocketHelper extends Helper
         $fd = intval($fd);
         $code = intval($code);
 
+        /** @var PushMessage $push_message */
+        $push_message = AppHelper::getContainer()->get(PushMessage::class)
+            ->withCode($code)
+            ->withMessage(strval($message))
+            ->withData($definition);
+
         $server = AppHelper::getServer();
-        $server->push(
-            $fd,
-            json_encode([
-                'time' => time(),
-                'code' => $code,
-                'message' => $message ?: WebSocketErrorCode::getMessage($code),
-                'data' => $definition instanceof MessageDefinitionInterface ? $definition->toArray() : null,
-            ])
-        );
+        $server->push($fd, $push_message->toJson());
 
         if ($isClose) $server->close($fd);
     }

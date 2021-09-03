@@ -13,6 +13,7 @@ namespace App\Swoole\Websocket;
 
 use App\Constants\MessageDefinition\Message;
 use App\Constants\MessageDefinition\TextMessage;
+use App\Helpers\AppHelper;
 use App\Helpers\WebsocketHelper;
 use Hyperf\Contract\OnMessageInterface;
 use Swoole\WebSocket\Frame;
@@ -37,6 +38,13 @@ class OnMessage implements OnMessageInterface
                 break;
         }
 
-        WebsocketHelper::pushMessage($frame->fd, $message);
+        $account_id = AppHelper::getAccountToken()->getAccountId();
+        $authorization_id = AppHelper::getAccountToken()->getAuthorizationId();
+
+        foreach (WebsocketHelper::getAccountAuthorizationFd($account_id, $authorization_id) as $fd) {
+            AppHelper::getGo(function ($fd, $message) {
+                WebsocketHelper::pushMessage($fd, $message);
+            }, $fd, $message);
+        }
     }
 }

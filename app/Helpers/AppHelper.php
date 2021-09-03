@@ -11,6 +11,8 @@ declare(strict_types=1);
  */
 namespace App\Helpers;
 
+use Hyperf\Contract\StdoutLoggerInterface;
+use Throwable;
 use App\Repository\AchieveClass\AccountToken;
 use App\Swoole\Table\IMTable;
 use Hyperf\DbConnection\Db;
@@ -78,6 +80,15 @@ class AppHelper extends Helper
     }
 
     /**
+     * 获取日志服务
+     * @return StdoutLoggerInterface|mixed
+     */
+    protected function getLogger()
+    {
+        return $this->getContainer()->get(StdoutLoggerInterface::class);
+    }
+
+    /**
      * 获取 Swoole Server
      * @return mixed|Server
      */
@@ -109,5 +120,25 @@ class AppHelper extends Helper
     protected function getAuthorizationId(): int
     {
         return intval($this->getServerRequest()->authorization_id);
+    }
+
+    /**
+     * 协程处理
+     * @param callable $closure
+     * @param          ...$arguments
+     */
+    protected function getGo(callable $closure, ...$arguments)
+    {
+        go(function () use ($closure, $arguments) {
+            try {
+                $closure(...$arguments);
+            } catch (Throwable $e) {
+                $this->getLogger()->warning($e->getMessage(), [
+                    'code' => $e->getCode(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ]);
+            }
+        });
     }
 }

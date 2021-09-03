@@ -31,6 +31,27 @@ interface MessageInterface
     public function withMessageData(array $messageData): self;
 
     /**
+     * 设置房间类型
+     * @param string $roomType
+     * @return $this
+     */
+    public function withRoomType(string $roomType): self;
+
+    /**
+     * 设置房间 ID
+     * @param string $roomId
+     * @return $this
+     */
+    public function withRoomId(string $roomId): self;
+
+    /**
+     * 设置接收者用户账号 ID
+     * @param int $toAccountId
+     * @return $this
+     */
+    public function withToAccountId(int $toAccountId): self;
+
+    /**
      * 获取消息类型
      * @return string
      */
@@ -41,4 +62,22 @@ interface MessageInterface
      * @return array
      */
     public function getMessageData(): array;
+
+    /**
+     * 获取房间类型
+     * @return string
+     */
+    public function getRoomType(): string;
+
+    /**
+     * 获取房间 ID
+     * @return string
+     */
+    public function getRoomId(): string;
+
+    /**
+     * 获取接收者用户账号 ID
+     * @return int
+     */
+    public function getToAccountId(): int;
 }
