@@ -41,6 +41,21 @@ class WebSocketErrorCode extends AbstractConstants
     const WS_AUTHORIZATION_ACCOUNT_VERIFICATION_FAILED = 10002;
 
     /**
+     * @Message("The user account has been logged in on other devices")
+     */
+    const WS_ACCOUNT_ON_OTHER_DEVICES_LOGIN = 10003;
+
+    /**
+     * @Message("Please add the other party as a friend first")
+     */
+    const WS_TO_ACCOUNT_NOT_FRIEND = 10004;
+
+    /**
+     * @Message("You can't add yourself as a friend")
+     */
+    const WS_NOT_FIREND_TO_ME = 10005;
+
+    /**
      * @Message("Message data parsing failed")
      */
     const WS_MESSAGE_RESOLVE_ERROR = 20001;

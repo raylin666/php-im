@@ -14,31 +14,32 @@ namespace App\Constants\MessageDefinition;
 use App\Contract\MessageInterface;
 
 /**
- * 文本消息类型
+ * 用户账号申请加好友消息类型
  *
- * 请求；
- * {"message_type": "friend_apply", "message_data": {"content": "hello world"}, "room_type": "C2C", "to_account_id": "5"}
+ * 请求：
+ * {"message_type": "friend_apply", "message_data": {"apply_remark": "您好啊，兄弟"}, "room_type": "C2C", "to_account_id": "5"}
  *
  * 响应：
  * {
         "room_type": "C2C",
         "room_id": "",
+        "from_account_id": 8,
         "to_account_id": 5,
-        "message_type": "text",
+        "message_type": "friend_apply",
         "message_data": {
-            "content": "hello world"
+            "apply_remark": "\u60a8\u597d\u554a\uff0c\u5144\u5f1f"
         }
     }
  */
-class TextMessage extends Message
+class FriendApplyMessage extends Message
 {
-    const MESSAGE_DATA_CONTENT = 'content';
+    const MESSAGE_APPLY_REMARK = 'apply_remark';
 
     /**
-     * 消息内容
+     * 申请加好友原因
      * @var string
      */
-    protected $messageContent = '';
+    protected $applyRemark = '';
 
     /**
      * @return string
@@ -47,27 +48,26 @@ class TextMessage extends Message
     {
         // TODO: Implement getMessageType() method.
 
-        return MessageStruct::MESSAGE_TYPE_TEXT;
+        return MessageStruct::MESSAGE_FRIEND_APPLY;
     }
 
     /**
-     * 设置消息内容
-     * @param string $messageContent
+     * 申请加好友原因
+     * @param string $applyRemark
      * @return $this
      */
-    protected function withMessageContent(string $messageContent = ''): self
+    protected function withApplyRemark(string $applyRemark): self
     {
-        $this->messageContent = $messageContent;
+        $this->applyRemark = $applyRemark;
         return $this;
     }
 
     /**
-     * 获取消息内容
      * @return string
      */
-    public function getMessageContent(): string
+    public function getApplyRemark(): string
     {
-        return $this->messageContent;
+        return $this->applyRemark;
     }
 
     /**
@@ -80,7 +80,7 @@ class TextMessage extends Message
         return $this->getMessageStruct()
             ->withMessageType($this->getMessageType())
             ->withMessageData([
-                self::MESSAGE_DATA_CONTENT => $this->getMessageContent(),
+                self::MESSAGE_APPLY_REMARK => $this->getApplyRemark(),
             ]);
     }
 }

@@ -11,8 +11,13 @@ declare(strict_types=1);
  */
 namespace App\Helpers;
 
+use App\Constants\MessageDefinition\EnterGroupMessage;
+use App\Constants\MessageDefinition\ExitGroupMessage;
+use App\Constants\MessageDefinition\FriendApplyMessage;
+use App\Constants\MessageDefinition\JoinGroupMessage;
 use App\Constants\MessageDefinition\Message;
 use App\Constants\MessageDefinition\MessageStruct;
+use App\Constants\MessageDefinition\QuitGroupMessage;
 use App\Constants\MessageDefinition\TextMessage;
 use App\Constants\WebSocketErrorCode;
 use App\Contract\MessageDefinitionInterface;
@@ -66,6 +71,7 @@ class WebsocketHelper extends Helper
 
         $roomTypeInstance = AppHelper::getContainer()->get(RoomType::class);
 
+        $accountId = AppHelper::getAccountToken()->getAccountId();
         $messageType = $data[Message::MESSAGE_TYPE] ?? '';
         $messageData = $data[Message::MESSAGE_DATA] ?? '';
         $roomType = $data[Message::ROOM_TYPE] ?? '';
@@ -88,13 +94,42 @@ class WebsocketHelper extends Helper
                     $messageData[TextMessage::MESSAGE_DATA_CONTENT] ?? ''
                 );
                 break;
+            case MessageStruct::MESSAGE_ENTER_GROUP:
+                $messageStruct = EnterGroupMessage::withEnterAccountId(
+                    $messageData[EnterGroupMessage::MESSAGE_ENTER_ACCOUNT_ID] ?? 0
+                );
+                break;
+            case MessageStruct::MESSAGE_QUIT_GROUP:
+                $messageStruct = QuitGroupMessage::withQuitAccountId(
+                    $messageData[QuitGroupMessage::MESSAGE_QUIT_ACCOUNT_ID] ?? 0
+                );
+                break;
+            case MessageStruct::MESSAGE_JOIN_GROUP:
+                $messageStruct = JoinGroupMessage::withJoinAccountId(
+                    $messageData[JoinGroupMessage::MESSAGE_JOIN_ACCOUNT_ID] ?? 0
+                );
+                break;
+            case MessageStruct::MESSAGE_EXIT_GROUP:
+                $messageStruct = ExitGroupMessage::withExitAccountId(
+                    $messageData[ExitGroupMessage::MESSAGE_EXIT_ACCOUNT_ID] ?? 0
+                );
+                break;
+            case MessageStruct::MESSAGE_FRIEND_APPLY:
+                // 不能加自己为好友
+                if ($toAccountId == $accountId) {
+                    $this->pushMessage($fd, null, WebSocketErrorCode::WS_NOT_FIREND_TO_ME);
+                    return;
+                }
+                $messageStruct = FriendApplyMessage::withApplyRemark(
+                        $messageData[FriendApplyMessage::MESSAGE_APPLY_REMARK] ?? ''
+                    );
+                break;
             default:
                 $this->pushMessage($fd, null, WebSocketErrorCode::WS_UNSUPPORTED_MESSAGE_TYPE);
                 return;
         }
 
-        $messageStruct->withBasicMessage($roomType, $roomId, $toAccountId);
-
+        $messageStruct->withBasicMessage($roomType, $roomId, $accountId, $toAccountId);
         return $messageStruct;
     }
 
@@ -124,7 +159,6 @@ class WebsocketHelper extends Helper
 
         $server = AppHelper::getServer();
         $server->push($fd, $push_message->toJson());
-
         if ($isClose) $server->close($fd);
     }
 }

@@ -81,6 +81,12 @@ GOTO_VALID_RESULT:
             return;
         }
 
+        // 同一用户账号不允许同时在线
+        if (AccountAuthorization::isOnline($account_id, $authorization_id)) {
+            WebsocketHelper::pushMessage($fd, null, WebSocketErrorCode::WS_ACCOUNT_ON_OTHER_DEVICES_LOGIN, null, true);
+            return;
+        }
+
         // Token 解析内容数据保存
         AppHelper::getAccountToken()
             ->withAccountId($account_id)

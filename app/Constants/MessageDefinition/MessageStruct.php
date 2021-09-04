@@ -21,6 +21,16 @@ class MessageStruct implements MessageInterface
     const MESSAGE_TYPE_IMAGE = 'image';
     // 语音消息
     const MESSAGE_TYPE_VOICE = 'voice';
+    // 用户账号加入群消息
+    const MESSAGE_JOIN_GROUP = 'join_group';
+    // 用户账号退出群消息
+    const MESSAGE_EXIT_GROUP = 'exit_group';
+    // 用户账号进入群消息
+    const MESSAGE_ENTER_GROUP = 'enter_group';
+    // 用户账号离开群消息
+    const MESSAGE_QUIT_GROUP = 'quit_group';
+    // 用户账号申请加好友消息
+    const MESSAGE_FRIEND_APPLY = 'friend_apply';
 
     protected $messageType;
 
@@ -29,6 +39,8 @@ class MessageStruct implements MessageInterface
     protected $roomType;
 
     protected $roomId;
+
+    protected $fromAccountId;
 
     protected $toAccountId;
 
@@ -90,6 +102,21 @@ class MessageStruct implements MessageInterface
         // TODO: Implement getRoomId() method.
 
         return strval($this->roomId);
+    }
+
+    public function withFromAccountId(int $fromAccountId): MessageInterface
+    {
+        // TODO: Implement withFromAccountId() method.
+
+        $this->fromAccountId = $fromAccountId;
+        return $this;
+    }
+
+    public function getFromAccountId(): int
+    {
+        // TODO: Implement getFromAccountId() method.
+
+        return $this->fromAccountId;
     }
 
     public function withToAccountId(int $toAccountId): MessageInterface

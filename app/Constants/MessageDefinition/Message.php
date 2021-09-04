@@ -22,6 +22,7 @@ abstract class Message implements MessageDefinitionInterface
     const MESSAGE_DATA = 'message_data';
     const ROOM_TYPE = 'room_type';
     const ROOM_ID = 'room_id';
+    const FROM_ACCOUNT_ID = 'from_account_id';
     const TO_ACCOUNT_ID = 'to_account_id';
 
     /**
@@ -32,7 +33,7 @@ abstract class Message implements MessageDefinitionInterface
     /**
      * @return MessageInterface
      */
-    protected function getMessageStruct(): MessageInterface
+    public function getMessageStruct(): MessageInterface
     {
         if (! $this->messageStruct instanceof MessageInterface) {
             $this->messageStruct = WebsocketHelper::getMessageStruct();
@@ -44,14 +45,16 @@ abstract class Message implements MessageDefinitionInterface
     /**
      * @param string $roomType
      * @param string $roomId
+     * @param int    $fromAccountId
      * @param int    $toAccountId
      * @return MessageInterface
      */
-    public function withBasicMessage(string $roomType, string $roomId = '', int $toAccountId = 0): self
+    public function withBasicMessage(string $roomType, string $roomId = '', int $fromAccountId = 0, int $toAccountId = 0): self
     {
         $this->getMessageStruct()
             ->withRoomType($roomType)
             ->withRoomId($roomId)
+            ->withFromAccountId($fromAccountId)
             ->withToAccountId($toAccountId);
 
         return $this;
@@ -69,6 +72,7 @@ abstract class Message implements MessageDefinitionInterface
         return [
             self::ROOM_TYPE => $message->getRoomType(),
             self::ROOM_ID => $message->getRoomId(),
+            self::FROM_ACCOUNT_ID => $message->getFromAccountId(),
             self::TO_ACCOUNT_ID => $message->getToAccountId(),
             self::MESSAGE_TYPE => $message->getMessageType(),
             self::MESSAGE_DATA => $message->getMessageData(),
@@ -86,6 +90,16 @@ abstract class Message implements MessageDefinitionInterface
      * @return mixed
      */
     public static function __callStatic($name, $arguments)
+    {
+        return ApplicationContext::getContainer()->get(get_called_class())->$name(...$arguments);
+    }
+
+    /**
+     * @param $name
+     * @param $arguments
+     * @return mixed
+     */
+    public function __call($name, $arguments)
     {
         return ApplicationContext::getContainer()->get(get_called_class())->$name(...$arguments);
     }

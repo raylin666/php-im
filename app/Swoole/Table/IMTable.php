@@ -22,15 +22,12 @@ class IMTable
     const CONLUMN_ACCOUNT_ID = 'account_id';
     // 授权ID
     const COLUMN_AUTHORIZATION_ID = 'authorization_id';
-    // 房间ID
-    const COLUMN_ROOM_ID = 'room_id';
     // 数据内容
     const COLUMN_DATA = 'data';
 
     protected $fd = 0;
     protected $account_id = 0;
     protected $authorization_id = 0;
-    protected $room_id = 0;
     protected $data = '';
 
     /**
@@ -50,11 +47,6 @@ class IMTable
         ],
         [
             'name' => self::COLUMN_AUTHORIZATION_ID,
-            'type' => Table::TYPE_INT,
-            'size' => 19,
-        ],
-        [
-            'name' => self::COLUMN_ROOM_ID,
             'type' => Table::TYPE_INT,
             'size' => 19,
         ],
@@ -165,16 +157,6 @@ class IMTable
     public function withAuthorizationId(int $authorizationId): self
     {
         $this->authorization_id = $authorizationId;
-        return $this;
-    }
-
-    /**
-     * @param int $roomId
-     * @return $this
-     */
-    public function withRoomId(int $roomId): self
-    {
-        $this->room_id = $roomId;
         return $this;
     }
 
