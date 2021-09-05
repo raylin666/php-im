@@ -102,4 +102,17 @@ class AccountFriendApply extends Model
             'operated_at' => Carbon::now(),
         ]));
     }
+
+    /**
+     * 拒绝好友申请
+     * @param $apply_id
+     * @return bool
+     */
+    protected function rejectedAccountFriendApply($apply_id): bool
+    {
+        return boolval($this->where('id', $apply_id)->update([
+            'state' => self::STATE_REJECTED,
+            'operated_at' => Carbon::now(),
+        ]));
+    }
 }

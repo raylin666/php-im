@@ -108,20 +108,30 @@ class FriendService extends Service
                     throw new Exception('Friend relationship binding failed');
                 }
             }
+
+            Db::commit();
+
         } catch (Exception $e) {
             Db::rollBack();
         }
 
-        return $this->response()->success([]);
+        return $this->response()->success();
     }
 
     /**
      * 拒绝添加好友
-     * @param $to_account_id
-     * @return array|void
+     * @param $account_id
+     * @param $from_account_id
+     * @return array|mixed|void
      */
-    public function rejected($to_account_id)
+    public function rejected($account_id, $from_account_id)
     {
+        // 获取未确认的消息
+        if (! ($apply = AccountFriendApply::getBeConfirm($from_account_id, $account_id))) {
+            return $this->response()->error(HttpErrorCode::TO_ACCOUNT_NOT_JOIN_FRIEND);
+        }
 
+        AccountFriendApply::rejectedAccountFriendApply($apply['id']);
+        return $this->response()->success();
     }
 }

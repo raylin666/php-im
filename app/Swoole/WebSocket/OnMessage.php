@@ -11,16 +11,12 @@ declare(strict_types=1);
  */
 namespace App\Swoole\Websocket;
 
-use App\Constants\MessageDefinition\FriendApplyMessage;
 use App\Constants\MessageDefinition\Message;
 use App\Constants\MessageDefinition\TextMessage;
-use App\Constants\WebSocketErrorCode;
 use App\Contract\RoomTypeInterface;
 use App\Helpers\AppHelper;
 use App\Helpers\CommonHelper;
 use App\Helpers\WebsocketHelper;
-use App\Model\Account\AccountFriend;
-use App\Model\Account\AccountFriendApply;
 use Hyperf\Contract\OnMessageInterface;
 use Swoole\WebSocket\Frame;
 
@@ -57,16 +53,6 @@ class OnMessage implements OnMessageInterface
             return $call_message;
         };
 
-        // 判断是否好友关系
-        $builder_beto_friend_relation = function ($account_id, $to_account_id) use ($frame) {
-            if (AccountFriend::isBetoFriendRelation($account_id, $to_account_id)) {
-                WebsocketHelper::pushMessage($frame->fd, null, WebSocketErrorCode::WS_TO_ACCOUNT_IS_FRIEND);
-                return false;
-            }
-
-            return true;
-        };
-
         $message_struct = $message->getMessageStruct();
         $account_id = AppHelper::getAccountToken()->getAccountId();
         $authorization_id = AppHelper::getAccountToken()->getAuthorizationId();
@@ -74,18 +60,6 @@ class OnMessage implements OnMessageInterface
 
         switch (get_class($message)) {
             case TextMessage::class:
-                break;
-            case FriendApplyMessage::class:
-                $is_send_current_account = false;
-                // 判断是否好友关系
-                if (! $builder_beto_friend_relation($account_id, $to_account_id)) return;
-                // 判断是否已有未确认的消息
-                if (AccountFriendApply::isExistBeConfirm($account_id, $to_account_id)) {
-                    WebsocketHelper::pushMessage($frame->fd, null, WebSocketErrorCode::WS_TO_ACCOUNT_JOIN_FRIEND_BE_CONFIRM);
-                    return;
-                }
-                // 写入申请好友消息
-                AccountFriendApply::addAccountFriendApply($account_id, $to_account_id, $message->getApplyRemark());
                 break;
         }
 

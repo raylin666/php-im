@@ -13,7 +13,6 @@ namespace App\Helpers;
 
 use App\Constants\MessageDefinition\EnterGroupMessage;
 use App\Constants\MessageDefinition\ExitGroupMessage;
-use App\Constants\MessageDefinition\FriendApplyMessage;
 use App\Constants\MessageDefinition\JoinGroupMessage;
 use App\Constants\MessageDefinition\MessageStruct;
 use App\Constants\MessageDefinition\QuitGroupMessage;
@@ -111,16 +110,6 @@ class WebsocketHelper extends Helper
             case MessageStruct::MESSAGE_EXIT_GROUP:
                 $messageStruct = ExitGroupMessage::withExitAccountId(
                     $messageData[ExitGroupMessage::MESSAGE_EXIT_ACCOUNT_ID] ?? 0
-                );
-                break;
-            case MessageStruct::MESSAGE_FRIEND_APPLY:
-                // 不能加自己为好友
-                if ($toAccountId == $accountId) {
-                    $this->pushMessage($fd, null, WebSocketErrorCode::WS_NOT_FIREND_TO_ME);
-                    return;
-                }
-                $messageStruct = FriendApplyMessage::withApplyRemark(
-                    $messageData[FriendApplyMessage::MESSAGE_APPLY_REMARK] ?? ''
                 );
                 break;
             default:

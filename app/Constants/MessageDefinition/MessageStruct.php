@@ -50,10 +50,6 @@ class MessageStruct implements MessageInterface
     const MESSAGE_ENTER_GROUP = 'enter_group';
     // 用户账号离开群消息
     const MESSAGE_QUIT_GROUP = 'quit_group';
-    // 用户账号申请加好友消息
-    const MESSAGE_FRIEND_APPLY = 'friend_apply';
-    // 通过用户账号加好友申请消息
-    const MESSAGE_PASSED_FRIEND_APPLY = 'passed_friend_apply';
 
     protected $messageType;
 

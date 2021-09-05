@@ -14,6 +14,7 @@ namespace App\Controller\Http;
 use App\Controller\AbstractController;
 use App\Request\Friend\ApplyFriendRequest;
 use App\Request\Friend\PassedFriendRequest;
+use App\Request\Friend\RejectedFriendRequest;
 use App\Services\Account\FriendService;
 
 /**
@@ -52,13 +53,16 @@ class FriendController extends AbstractController
 
     /**
      * 拒绝添加好友
-     * @param $account_id
+     * @param RejectedFriendRequest $request
+     * @param                       $account_id
      * @return mixed
      */
-    public function rejected($account_id)
+    public function rejected(RejectedFriendRequest $request, $account_id)
     {
+        $data = $request->validated();
+
         return $this->response->RESTfulAPI(
-            FriendService::getInstance()->rejected($account_id)
+            FriendService::getInstance()->rejected($account_id, $data['from_account_id'])
         );
     }
 }
