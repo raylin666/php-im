@@ -18,13 +18,6 @@ use Hyperf\Utils\ApplicationContext;
 
 abstract class Message implements MessageDefinitionInterface
 {
-    const MESSAGE_TYPE = 'message_type';
-    const MESSAGE_DATA = 'message_data';
-    const ROOM_TYPE = 'room_type';
-    const ROOM_ID = 'room_id';
-    const FROM_ACCOUNT_ID = 'from_account_id';
-    const TO_ACCOUNT_ID = 'to_account_id';
-
     /**
      * @var MessageInterface
      */
@@ -43,19 +36,27 @@ abstract class Message implements MessageDefinitionInterface
     }
 
     /**
+     * @param int    $messageId
      * @param string $roomType
      * @param string $roomId
      * @param int    $fromAccountId
      * @param int    $toAccountId
      * @return MessageInterface
      */
-    public function withBasicMessage(string $roomType, string $roomId = '', int $fromAccountId = 0, int $toAccountId = 0): self
+    public function withBasicMessage(
+        int $messageId,
+        string $roomType,
+        string $roomId = '',
+        int $fromAccountId = 0,
+        int $toAccountId = 0
+    ): self
     {
         $this->getMessageStruct()
             ->withRoomType($roomType)
             ->withRoomId($roomId)
             ->withFromAccountId($fromAccountId)
-            ->withToAccountId($toAccountId);
+            ->withToAccountId($toAccountId)
+            ->withMessageId($messageId);
 
         return $this;
     }
@@ -70,12 +71,13 @@ abstract class Message implements MessageDefinitionInterface
         $message = $this->toMessage();
 
         return [
-            self::ROOM_TYPE => $message->getRoomType(),
-            self::ROOM_ID => $message->getRoomId(),
-            self::FROM_ACCOUNT_ID => $message->getFromAccountId(),
-            self::TO_ACCOUNT_ID => $message->getToAccountId(),
-            self::MESSAGE_TYPE => $message->getMessageType(),
-            self::MESSAGE_DATA => $message->getMessageData(),
+            MessageStruct::ROOM_TYPE => $message->getRoomType(),
+            MessageStruct::ROOM_ID => $message->getRoomId(),
+            MessageStruct::FROM_ACCOUNT_ID => $message->getFromAccountId(),
+            MessageStruct::TO_ACCOUNT_ID => $message->getToAccountId(),
+            MessageStruct::MESSAGE_TYPE => $message->getMessageType(),
+            MessageStruct::MESSAGE_ID => $message->getMessageId(),
+            MessageStruct::MESSAGE_DATA => $message->getMessageData(),
         ];
     }
 

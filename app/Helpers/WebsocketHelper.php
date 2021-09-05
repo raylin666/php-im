@@ -15,7 +15,6 @@ use App\Constants\MessageDefinition\EnterGroupMessage;
 use App\Constants\MessageDefinition\ExitGroupMessage;
 use App\Constants\MessageDefinition\FriendApplyMessage;
 use App\Constants\MessageDefinition\JoinGroupMessage;
-use App\Constants\MessageDefinition\Message;
 use App\Constants\MessageDefinition\MessageStruct;
 use App\Constants\MessageDefinition\QuitGroupMessage;
 use App\Constants\MessageDefinition\TextMessage;
@@ -72,11 +71,11 @@ class WebsocketHelper extends Helper
         $roomTypeInstance = AppHelper::getContainer()->get(RoomType::class);
 
         $accountId = AppHelper::getAccountToken()->getAccountId();
-        $messageType = $data[Message::MESSAGE_TYPE] ?? '';
-        $messageData = $data[Message::MESSAGE_DATA] ?? '';
-        $roomType = $data[Message::ROOM_TYPE] ?? '';
-        $roomId = $data[Message::ROOM_ID] ?? '';
-        $toAccountId = intval($data[Message::TO_ACCOUNT_ID] ?? 0);
+        $messageType = $data[MessageStruct::MESSAGE_TYPE] ?? '';
+        $messageData = $data[MessageStruct::MESSAGE_DATA] ?? '';
+        $roomType = $data[MessageStruct::ROOM_TYPE] ?? '';
+        $roomId = $data[MessageStruct::ROOM_ID] ?? '';
+        $toAccountId = intval($data[MessageStruct::TO_ACCOUNT_ID] ?? 0);
         if (empty($messageType)
             || empty($messageData)
             || empty($roomType)
@@ -121,15 +120,15 @@ class WebsocketHelper extends Helper
                     return;
                 }
                 $messageStruct = FriendApplyMessage::withApplyRemark(
-                        $messageData[FriendApplyMessage::MESSAGE_APPLY_REMARK] ?? ''
-                    );
+                    $messageData[FriendApplyMessage::MESSAGE_APPLY_REMARK] ?? ''
+                );
                 break;
             default:
                 $this->pushMessage($fd, null, WebSocketErrorCode::WS_UNSUPPORTED_MESSAGE_TYPE);
                 return;
         }
 
-        $messageStruct->withBasicMessage($roomType, $roomId, $accountId, $toAccountId);
+        $messageStruct->withBasicMessage(0, $roomType, $roomId, $accountId, $toAccountId);
         return $messageStruct;
     }
 

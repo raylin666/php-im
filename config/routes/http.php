@@ -31,3 +31,12 @@ Router::addGroup('/account', function () {
     // 删除用户账号
     Router::delete('/{account_id}/delete', 'App\Controller\Http\AccountController@delete');
 });
+
+Router::addGroup('/friend', function () {
+    // 申请添加好友
+    Router::post('/{account_id}/apply', 'App\Controller\Http\FriendController@apply');
+    // 确认添加好友
+    Router::post('/{account_id}/passed', 'App\Controller\Http\FriendController@passed');
+    // 拒绝添加好友
+    Router::post('/{account_id}/rejected', 'App\Controller\Http\FriendController@rejected');
+});

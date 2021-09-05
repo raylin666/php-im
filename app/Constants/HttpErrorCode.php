@@ -321,27 +321,62 @@ class HttpErrorCode extends AbstractConstants
     const HTTP_NETWORK_AUTHENTICATION_REQUIRED = 511;
 
     /**
-     * @Message("Account not authorized")
+     * @Message("未授权的用户帐户")
      */
     const AUTHORIZATION_ACCOUNT_VERIFICATION_FAILED = 10001;
 
     /**
-     * @Message("Account already exists")
+     * @Message("用户帐户已存在")
      */
     const ACCOUNT_ALREADY_EXISTS = 10002;
 
     /**
-     * @Message("Failed to add user account")
+     * @Message("无法添加用户帐户")
      */
     const ACCOUNT_ADD_ERROR = 10003;
 
     /**
-     * @Message("Account not available")
+     * @Message("用户帐户不可用")
      */
     const ACCOUNT_NOT_AVAILABLE = 10004;
 
     /**
-     * @Message("Account uid cannot be modified")
+     * @Message("无法修改用户帐户-UID")
      */
     const ACCOUNT_UID_CANNOT_BE_MODIFIED = 10005;
+
+    /**
+     * @Message("你们已经是好友关系了")
+     */
+    const TO_ACCOUNT_IS_FRIEND = 10006;
+
+    /**
+     * @Message("您的好友申请已发送, 请不要多次申请")
+     */
+    const TO_ACCOUNT_JOIN_FRIEND_BE_CONFIRM = 10007;
+
+    /**
+     * @Message("申请添加对方为好友失败")
+     */
+    const TO_ACCOUNT_JOIN_FRIEND_ERROR = 10008;
+
+    /**
+     * @Message("不能将自己添加为好友关系")
+     */
+    const TO_ACCOUNT_JOIN_FRIEND_NOT_ME = 10009;
+
+    /**
+     * @Message("用户帐户不存在")
+     */
+    const ACCOUNT_NOT_EXIST = 10010;
+
+    /**
+     * @Message("对方用户帐户不可用")
+     */
+    const ACCOUNT_OTHER_NOT_AVAILABLE = 10011;
+
+    /**
+     * @Message("不存在的申请好友ID")
+     */
+    const TO_ACCOUNT_NOT_JOIN_FRIEND = 10012;
 }

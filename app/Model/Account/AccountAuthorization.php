@@ -83,7 +83,7 @@ class AccountAuthorization extends Model
      * @return int
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    protected function createData($account_id, $authorization_id)
+    protected function addAccountAuthorization($account_id, $authorization_id)
     {
         $token = JWTHelper::generateToken(
             AppHelper::getAccountToken()

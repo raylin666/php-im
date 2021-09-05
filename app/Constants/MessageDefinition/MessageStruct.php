@@ -15,6 +15,27 @@ use App\Contract\MessageInterface;
 
 class MessageStruct implements MessageInterface
 {
+    /**
+     * 消息格式
+     */
+    // 消息类型
+    const MESSAGE_TYPE = 'message_type';
+    // 消息 ID
+    const MESSAGE_ID = 'message_id';
+    // 消息数据结构体
+    const MESSAGE_DATA = 'message_data';
+    // 房间类型
+    const ROOM_TYPE = 'room_type';
+    // 房间 ID
+    const ROOM_ID = 'room_id';
+    // 发送者账号 ID
+    const FROM_ACCOUNT_ID = 'from_account_id';
+    // 接收者账号 ID
+    const TO_ACCOUNT_ID = 'to_account_id';
+
+    /**
+     * 消息类型
+     */
     // 文本消息
     const MESSAGE_TYPE_TEXT = 'text';
     // 图片消息
@@ -31,8 +52,12 @@ class MessageStruct implements MessageInterface
     const MESSAGE_QUIT_GROUP = 'quit_group';
     // 用户账号申请加好友消息
     const MESSAGE_FRIEND_APPLY = 'friend_apply';
+    // 通过用户账号加好友申请消息
+    const MESSAGE_PASSED_FRIEND_APPLY = 'passed_friend_apply';
 
     protected $messageType;
+
+    protected $messageId;
 
     protected $messageData;
 
@@ -59,7 +84,21 @@ class MessageStruct implements MessageInterface
         return strval($this->messageType);
     }
 
-    public function withMessageData(array $messageData): MessageInterface
+    public function withMessageId(int $messageId): MessageInterface
+    {
+        $this->messageId = $messageId;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMessageId(): int
+    {
+        return intval($this->messageId);
+    }
+
+    public function withMessageData(array $messageData = []): MessageInterface
     {
         // TODO: Implement withMessageData() method.
 

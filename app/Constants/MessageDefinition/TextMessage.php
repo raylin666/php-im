@@ -25,6 +25,7 @@ use App\Contract\MessageInterface;
         "room_id": "",
         "to_account_id": 5,
         "message_type": "text",
+        "message_id": 1,
         "message_data": {
             "content": "hello world"
         }

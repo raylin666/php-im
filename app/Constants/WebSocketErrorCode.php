@@ -56,6 +56,16 @@ class WebSocketErrorCode extends AbstractConstants
     const WS_NOT_FIREND_TO_ME = 10005;
 
     /**
+     * @Message("You are already friends")
+     */
+    const WS_TO_ACCOUNT_IS_FRIEND = 10006;
+
+    /**
+     * @Message("Your friend application has been sent out. Please do not apply multiple times")
+     */
+    const WS_TO_ACCOUNT_JOIN_FRIEND_BE_CONFIRM = 10007;
+
+    /**
      * @Message("Message data parsing failed")
      */
     const WS_MESSAGE_RESOLVE_ERROR = 20001;

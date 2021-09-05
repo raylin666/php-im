@@ -19,7 +19,7 @@ use App\Services\Service;
 use Carbon\Carbon;
 
 /**
- * Class Service
+ * Class AccountService
  * @method static $this getInstance(...$args)
  * @package App\Services\Account
  */
@@ -70,7 +70,7 @@ class AccountService extends Service
             }
         } else {
             // 生成用户账号授权数据
-            AccountAuthorization::createData($account_id, $authorization_id);
+            AccountAuthorization::addAccountAuthorization($account_id, $authorization_id);
             $account_authorization = $account_authorization_func($account_id, $authorization_id);
         }
 

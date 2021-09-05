@@ -24,6 +24,18 @@ CREATE TABLE `im_account_friend` (
   UNIQUE KEY `uk_account_to` (`account_id`,`to_account_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户账号好友关系表';
 
+CREATE TABLE `im_account_friend_apply` (
+ `id` bigint(19) unsigned NOT NULL AUTO_INCREMENT,
+ `account_id` bigint(19) unsigned NOT NULL DEFAULT '0' COMMENT '用户账号ID',
+ `to_account_id` bigint(19) unsigned NOT NULL DEFAULT '0' COMMENT '申请添加好友账号ID',
+ `to_account_remark` varchar(20) NOT NULL DEFAULT '' COMMENT '添加原因备注',
+ `state` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '状态 0:待确认 1:已通过 2:已拒绝',
+ `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+ `operated_at` datetime DEFAULT NULL COMMENT '操作时间 (通过或拒绝)',
+ PRIMARY KEY (`id`),
+ UNIQUE KEY `uk_account_to` (`account_id`,`to_account_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户账号好友申请表';
+
 CREATE TABLE `im_authorization` (
   `id` bigint(19) unsigned NOT NULL AUTO_INCREMENT,
   `app` varchar(36) NOT NULL COMMENT '使用应用名称',
@@ -52,4 +64,16 @@ CREATE TABLE `im_account_authorization` (
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_account_authorization` (`account_id`, `authorization_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户账号授权管理表';
+
+CREATE TABLE `im_c2c_message` (
+   `id` bigint(19) unsigned NOT NULL AUTO_INCREMENT,
+   `account_id` bigint(19) unsigned NOT NULL DEFAULT '0' COMMENT '用户账号ID',
+   `to_account_id` bigint(19) unsigned NOT NULL DEFAULT '0' COMMENT '申请添加好友账号ID',
+   `to_account_remark` varchar(20) NOT NULL DEFAULT '' COMMENT '添加原因备注',
+   `state` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '状态 0:待确认 1:已通过 2:已拒绝',
+   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+   `operated_at` datetime DEFAULT NULL COMMENT '操作时间 (通过或拒绝)',
+   PRIMARY KEY (`id`),
+   UNIQUE KEY `uk_account_to` (`account_id`,`to_account_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='C2C消息记录表';
 

@@ -4,6 +4,7 @@ declare (strict_types=1);
 namespace App\Model\Account;
 
 use App\Model\Model;
+use Carbon\Carbon;
 
 /**
  * @property int $id 
@@ -81,5 +82,46 @@ class AccountFriend extends Model
             })
             ->where('state', self::STATE_OPEN)
             ->count() > 1;
+    }
+
+    /**
+     * 好友关系绑定
+     * @param $from_account_id
+     * @param $to_account_id
+     * @param $to_account_remark
+     * @return bool
+     */
+    protected function bindFriendRelation($from_account_id, $to_account_id, $to_account_remark): bool
+    {
+        $this->updateOrInsert(
+            [
+                'account_id' => $from_account_id,
+                'to_account_id' => $to_account_id,
+            ],
+            [
+                'account_id' => $from_account_id,
+                'to_account_id' => $to_account_id,
+                'state' => self::STATE_OPEN,
+                'created_at' => Carbon::now(),
+                'deleted_at' => null,
+            ]
+        );
+
+        $this->updateOrInsert(
+            [
+                'account_id' => $to_account_id,
+                'to_account_id' => $from_account_id,
+            ],
+            [
+                'account_id' => $to_account_id,
+                'to_account_id' => $from_account_id,
+                'to_account_remark' => $to_account_remark,
+                'state' => self::STATE_OPEN,
+                'created_at' => Carbon::now(),
+                'deleted_at' => null,
+            ]
+        );
+
+        return true;
     }
 }

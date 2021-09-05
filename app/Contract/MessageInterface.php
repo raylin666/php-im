@@ -24,11 +24,18 @@ interface MessageInterface
     public function withMessageType(string $messageType): self;
 
     /**
+     * 设置消息 ID
+     * @param int $messageId
+     * @return $this
+     */
+    public function withMessageId(int $messageId): self;
+
+    /**
      * 设置消息内容
      * @param array $messageData
      * @return $this
      */
-    public function withMessageData(array $messageData): self;
+    public function withMessageData(array $messageData = []): self;
 
     /**
      * 设置房间类型
@@ -63,6 +70,12 @@ interface MessageInterface
      * @return string
      */
     public function getMessageType(): string;
+
+    /**
+     * 获取消息 ID
+     * @return int
+     */
+    public function getMessageId(): int;
 
     /**
      * 获取消息内容

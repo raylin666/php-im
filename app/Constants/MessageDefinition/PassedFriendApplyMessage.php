@@ -14,7 +14,7 @@ namespace App\Constants\MessageDefinition;
 use App\Contract\MessageInterface;
 
 /**
- * 用户账号申请加好友消息类型
+ * 通过用户账号加好友申请消息类型
  *
  * 请求：
  * {"message_type": "friend_apply", "message_data": {"apply_remark": "您好啊，兄弟"}, "room_type": "C2C", "to_account_id": "5"}
@@ -32,16 +32,8 @@ use App\Contract\MessageInterface;
         }
     }
  */
-class FriendApplyMessage extends Message
+class PassedFriendApplyMessage extends Message
 {
-    const MESSAGE_APPLY_REMARK = 'apply_remark';
-
-    /**
-     * 申请加好友原因
-     * @var string
-     */
-    protected $applyRemark = '';
-
     /**
      * @return string
      */
@@ -49,26 +41,7 @@ class FriendApplyMessage extends Message
     {
         // TODO: Implement getMessageType() method.
 
-        return MessageStruct::MESSAGE_FRIEND_APPLY;
-    }
-
-    /**
-     * 申请加好友原因
-     * @param string $applyRemark
-     * @return $this
-     */
-    protected function withApplyRemark(string $applyRemark): self
-    {
-        $this->applyRemark = $applyRemark;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getApplyRemark(): string
-    {
-        return $this->applyRemark;
+        return MessageStruct::MESSAGE_PASSED_FRIEND_APPLY;
     }
 
     /**
@@ -80,8 +53,6 @@ class FriendApplyMessage extends Message
 
         return $this->getMessageStruct()
             ->withMessageType($this->getMessageType())
-            ->withMessageData([
-                self::MESSAGE_APPLY_REMARK => $this->getApplyRemark(),
-            ]);
+            ->withMessageData();
     }
 }
