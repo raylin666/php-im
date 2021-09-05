@@ -14,8 +14,8 @@ namespace App\Services\Account;
 use Exception;
 use App\Constants\HttpErrorCode;
 use App\Model\Account\Account;
-use App\Model\Account\AccountFriend;
-use App\Model\Account\AccountFriendApply;
+use App\Model\Friend\AccountFriend;
+use App\Model\Friend\AccountFriendApply;
 use App\Services\Service;
 use Hyperf\DbConnection\Db;
 

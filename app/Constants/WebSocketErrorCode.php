@@ -31,37 +31,37 @@ class WebSocketErrorCode extends AbstractConstants
     const WS_SUCCESS = 0;
 
     /**
-     * @Message("Account not authorized")
+     * @Message("未授权的用户帐户")
      */
     const WS_ACCOUNT_NOT_AUTHORIZED = 10001;
 
     /**
-     * @Message("Authorization account verification failed. Please ensure the normal authorization account")
+     * @Message("授权用户帐户验证失败。请确保正常的授权用户帐户")
      */
     const WS_AUTHORIZATION_ACCOUNT_VERIFICATION_FAILED = 10002;
 
     /**
-     * @Message("The user account has been logged in on other devices")
+     * @Message("用户帐户已登录到其他设备, 不支持同时在线")
      */
     const WS_ACCOUNT_ON_OTHER_DEVICES_LOGIN = 10003;
 
     /**
-     * @Message("Please add the other party as a friend first")
+     * @Message("请先将另一方用户添加为好友")
      */
     const WS_TO_ACCOUNT_NOT_FRIEND = 10004;
 
     /**
-     * @Message("You can't add yourself as a friend")
+     * @Message("你不能把自己添加为好友")
      */
     const WS_NOT_FIREND_TO_ME = 10005;
 
     /**
-     * @Message("You are already friends")
+     * @Message("你们已经是好友了")
      */
     const WS_TO_ACCOUNT_IS_FRIEND = 10006;
 
     /**
-     * @Message("Your friend application has been sent out. Please do not apply multiple times")
+     * @Message("您的好友申请已发送, 请不要多次申请")
      */
     const WS_TO_ACCOUNT_JOIN_FRIEND_BE_CONFIRM = 10007;
 

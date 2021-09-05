@@ -34,6 +34,8 @@ class OnMessage implements OnMessageInterface
         $call_message = [];
         // 是否需要发送消息给当前发送方
         $is_send_current_account = true;
+        // 是否需要将消息保存为消息历史
+        $is_save_message = false;
 
         $message  = WebsocketHelper::resolveMessage($frame->fd, $frame->data);
 
@@ -60,6 +62,7 @@ class OnMessage implements OnMessageInterface
 
         switch (get_class($message)) {
             case TextMessage::class:
+                $is_save_message = true;
                 break;
         }
 

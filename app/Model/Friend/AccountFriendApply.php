@@ -1,7 +1,7 @@
 <?php
 
 declare (strict_types=1);
-namespace App\Model\Account;
+namespace App\Model\Friend;
 
 use App\Model\Model;
 use Carbon\Carbon;

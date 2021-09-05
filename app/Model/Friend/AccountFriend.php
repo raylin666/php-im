@@ -1,8 +1,10 @@
 <?php
 
 declare (strict_types=1);
-namespace App\Model\Account;
+namespace App\Model\Friend;
 
+use App\Contract\RoomTypeInterface;
+use App\Helpers\CommonHelper;
 use App\Model\Model;
 use Carbon\Carbon;
 
@@ -93,12 +95,15 @@ class AccountFriend extends Model
      */
     protected function bindFriendRelation($from_account_id, $to_account_id, $to_account_remark): bool
     {
+        $room_ident = RoomTypeInterface::ROOM_TYPE_C2C . CommonHelper::generateUniqid();
+
         $this->updateOrInsert(
             [
                 'account_id' => $from_account_id,
                 'to_account_id' => $to_account_id,
             ],
             [
+                'ident' => $room_ident,
                 'account_id' => $from_account_id,
                 'to_account_id' => $to_account_id,
                 'state' => self::STATE_OPEN,
@@ -113,6 +118,7 @@ class AccountFriend extends Model
                 'to_account_id' => $from_account_id,
             ],
             [
+                'ident' => $room_ident,
                 'account_id' => $to_account_id,
                 'to_account_id' => $from_account_id,
                 'to_account_remark' => $to_account_remark,
