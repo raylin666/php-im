@@ -120,9 +120,9 @@ class OnMessage implements OnMessageInterface
         ) {
             $is_save_message = true;
 
-            $group_ident = $message->getMessageStruct()->getRoomId();
+            $group_id = $message->getMessageStruct()->getRoomId();
             // 判断群是否有效
-            $group_id = Group::getGroupId($group_ident);
+            $group_id = Group::getGroupId($group_id);
             if (! $group_id) {
                 WebsocketHelper::pushMessage($frame->fd, null, WebSocketErrorCode::WS_GROUP_NOT_VALID);
                 return;

@@ -73,7 +73,7 @@ class WebsocketHelper extends Helper
         $messageType = $data[MessageStruct::MESSAGE_TYPE] ?? '';
         $messageData = $data[MessageStruct::MESSAGE_DATA] ?? '';
         $roomType = $data[MessageStruct::ROOM_TYPE] ?? '';
-        $roomId = $data[MessageStruct::ROOM_ID] ?? '';
+        $roomId = intval($data[MessageStruct::ROOM_ID] ?? 0);
         $toAccountId = intval($data[MessageStruct::TO_ACCOUNT_ID] ?? 0);
         if (empty($messageType)
             || empty($messageData)

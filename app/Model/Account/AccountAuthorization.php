@@ -10,9 +10,10 @@ use App\Swoole\Table\IMTable;
 use Carbon\Carbon;
 
 /**
- * @property int $id 
- * @property int $account_id 
- * @property int $login_platform 
+ * @property int $id
+ * @property int $account_id
+ * @property int $authorization_id
+ * @property int $login_platform
  * @property string $token 
  * @property int $ttl 
  * @property string $expired_at 
@@ -53,9 +54,9 @@ class AccountAuthorization extends Model
      * @param null $token
      * @return bool
      */
-    protected function isNormalAccountAuthorization($account_id, $authorization_id, $token = null): bool
+    protected function isNormalAccountAuthorization($account_id, $token = null, $authorization_id): bool
     {
-        $builder = $this->where(['account_id' => $account_id, 'authorization_id' => $authorization_id]);
+        $builder = $this->where(['account_id' => $account_id, 'authorization_id' => $authorization_id ?: AppHelper::getAuthorizationId()]);
 
         if ($token) {
             $builder->where('token', $token);
@@ -69,22 +70,21 @@ class AccountAuthorization extends Model
     /**
      * 获取用户账号授权信息
      * @param $account_id
-     * @param $authorization_id
      * @return \Hyperf\Database\Model\Builder|\Hyperf\Database\Model\Model|object|null
      */
-    protected function getAccountAuthorization($account_id, $authorization_id)
+    protected function getAccountAuthorization($account_id)
     {
-        return $this->where(['account_id' => $account_id, 'authorization_id' => $authorization_id])->first();
+        return $this->where(['account_id' => $account_id, 'authorization_id' => AppHelper::getAuthorizationId()])->first();
     }
 
     /**
      * @param $account_id
-     * @param $authorization_id
      * @return int
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    protected function addAccountAuthorization($account_id, $authorization_id)
+    protected function addAccountAuthorization($account_id)
     {
+        $authorization_id = AppHelper::getAuthorizationId();
         $token = JWTHelper::generateToken(
             AppHelper::getAccountToken()
                 ->withAccountId($account_id)
@@ -106,12 +106,25 @@ class AccountAuthorization extends Model
 
     /**
      * @param $account_id
-     * @param $authorization_id
+     * @return int
+     */
+    protected function deleteAccountAuthorization($account_id): int
+    {
+        return $this->where(['account_id' => $account_id, 'authorization_id' => AppHelper::getAuthorizationId()])
+            ->whereNull('deleted_at')
+            ->update([
+                'deleted_at' => Carbon::now(),
+            ]);
+    }
+
+    /**
+     * @param $account_id
      * @return int
      * @throws \Psr\SimpleCache\InvalidArgumentException
      */
-    protected function updateTokenData($account_id, $authorization_id)
+    protected function updateTokenData($account_id)
     {
+        $authorization_id = AppHelper::getAuthorizationId();
         $token = JWTHelper::generateToken(
             AppHelper::getAccountToken()
                 ->withAccountId($account_id)
@@ -138,24 +151,23 @@ class AccountAuthorization extends Model
     protected function builderAccountAuthorization(AccountAuthorization $accountAuthorization)
     {
         return [
-            'id' => $accountAuthorization['id'],
-            'account_id' => $accountAuthorization['account_id'],
-            'authorization_id' => $accountAuthorization['authorization_id'],
-            'token' => $accountAuthorization['token'],
-            'expired_at' => $accountAuthorization['expired_at'],
-            'refresh_at' => $accountAuthorization['refresh_at'],
+            'id' => $accountAuthorization->id,
+            'account_id' => $accountAuthorization->account_id,
+            'authorization_id' => $accountAuthorization->authorization_id,
+            'token' => $accountAuthorization->token,
+            'expired_at' => $accountAuthorization->expired_at,
+            'refresh_at' => $accountAuthorization->refresh_at,
         ];
     }
 
     /**
      * 设置用户账号授权为在线
      * @param $account_id
-     * @param $authorization_id
      * @return bool
      */
-    protected function setOnline($account_id, $authorization_id): bool
+    protected function setOnline($account_id): bool
     {
-        $this->where(['account_id' => $account_id, 'authorization_id' => $authorization_id])
+        $this->where(['account_id' => $account_id, 'authorization_id' => AppHelper::getAuthorizationId()])
             ->update([
                 'is_online' => 1,
                 'onlined_at' => Carbon::now(),
@@ -167,12 +179,11 @@ class AccountAuthorization extends Model
     /**
      * 设置用户账号授权为离线
      * @param $account_id
-     * @param $authorization_id
      * @return bool
      */
-    protected function setOffline($account_id, $authorization_id): bool
+    protected function setOffline($account_id): bool
     {
-        $this->where(['account_id' => $account_id, 'authorization_id' => $authorization_id])
+        $this->where(['account_id' => $account_id, 'authorization_id' => AppHelper::getAuthorizationId()])
             ->update([
                 'is_online' => 0,
                 'offlined_at' => Carbon::now(),
@@ -184,13 +195,12 @@ class AccountAuthorization extends Model
     /**
      * 用户账号授权是否在线
      * @param $account_id
-     * @param $authorization_id
      * @return bool
      */
-    protected function isOnline($account_id, $authorization_id): bool
+    protected function isOnline($account_id): bool
     {
         foreach (AppHelper::getIMTable()->get() as $row) {
-            if (($row[IMTable::CONLUMN_ACCOUNT_ID] == $account_id) && ($row[IMTable::COLUMN_AUTHORIZATION_ID] == $authorization_id)) {
+            if (($row[IMTable::CONLUMN_ACCOUNT_ID] == $account_id) && ($row[IMTable::COLUMN_AUTHORIZATION_ID] == AppHelper::getAuthorizationId())) {
                 return true;
             }
         }

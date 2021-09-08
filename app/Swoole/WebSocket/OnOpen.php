@@ -66,11 +66,11 @@ class OnOpen implements OnOpenInterface
             goto GOTO_VALID_RESULT;
         }
 
-        if (! ($account_id = Account::getAccountId($parserData[AccountToken::AUTHORIZATION_ID], $parserData[AccountToken::ACCOUNT_ID]))) {
+        if (! ($account_id = Account::getAccountId($parserData[AccountToken::ACCOUNT_ID], $parserData[AccountToken::AUTHORIZATION_ID]))) {
             goto GOTO_VALID_RESULT;
         }
 
-        if (AccountAuthorization::isNormalAccountAuthorization($account_id, $parserData[AccountToken::AUTHORIZATION_ID], $account_token)) {
+        if (AccountAuthorization::isNormalAccountAuthorization($account_id, $account_token, $parserData[AccountToken::AUTHORIZATION_ID])) {
             $is_success_token = true;
         }
 
@@ -88,9 +88,7 @@ GOTO_VALID_RESULT:
         }
 
         // Token 解析内容数据保存
-        AppHelper::getAccountToken()
-            ->withAccountId($account_id)
-            ->withAuthorizationId($authorization_id);
+        AppHelper::getAccountToken()->withAccountId($account_id)->withAuthorizationId($authorization_id);
 
         // 创建 fd -> account 绑定关系
         AppHelper::getIMTable()

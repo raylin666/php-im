@@ -38,7 +38,7 @@ abstract class Message implements MessageDefinitionInterface
     /**
      * @param int    $messageId
      * @param string $roomType
-     * @param string $roomId
+     * @param int    $roomId
      * @param int    $fromAccountId
      * @param int    $toAccountId
      * @return MessageInterface
@@ -46,7 +46,7 @@ abstract class Message implements MessageDefinitionInterface
     public function withBasicMessage(
         int $messageId,
         string $roomType,
-        string $roomId = '',
+        int $roomId = 0,
         int $fromAccountId = 0,
         int $toAccountId = 0
     ): self

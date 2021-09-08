@@ -40,10 +40,8 @@ class FriendService extends Service
             return $this->response()->error(HttpErrorCode::TO_ACCOUNT_JOIN_FRIEND_NOT_ME);
         }
 
-        $authorization_id = AppHelper::getAuthorizationId();
-
         // 对方用户账号是否可用
-        if (! Account::isAccountAvailable($to_account_id, $authorization_id)) {
+        if (! Account::isAccountAvailable($to_account_id)) {
             return $this->response()->error(HttpErrorCode::ACCOUNT_NOT_EXIST);
         }
 
@@ -82,10 +80,8 @@ class FriendService extends Service
             return $this->response()->error(HttpErrorCode::TO_ACCOUNT_JOIN_FRIEND_NOT_ME);
         }
 
-        $authorization_id = AppHelper::getAuthorizationId();
-
         // 对方用户账号是否可用
-        if (! Account::isAccountAvailable($from_account_id, $authorization_id)) {
+        if (! Account::isAccountAvailable($from_account_id)) {
             return $this->response()->error(HttpErrorCode::ACCOUNT_OTHER_NOT_AVAILABLE);
         }
 

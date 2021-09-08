@@ -24,10 +24,10 @@ Router::addGroup('/account', function () {
     Router::get('/{account_id}/info', 'App\Controller\Http\AccountController@info');
     // 获取用户账号 Token
     Router::get('/{account_id}/account-token', 'App\Controller\Http\AccountController@accountToken');
-    // 添加用户账号
-    Router::put('/add', 'App\Controller\Http\AccountController@add');
+    // 创建用户账号
+    Router::put('/create', 'App\Controller\Http\AccountController@create');
     // 修改用户账号
-    Router::post('/{account_id}/edit', 'App\Controller\Http\AccountController@edit');
+    Router::post('/{account_id}/update', 'App\Controller\Http\AccountController@update');
     // 删除用户账号
     Router::delete('/{account_id}/delete', 'App\Controller\Http\AccountController@delete');
 });
@@ -49,7 +49,7 @@ Router::addGroup('/group', function () {
     // 获取群信息
     Router::get('/{group_id}/info', 'App\Controller\Http\GroupController@info');
     // 修改群信息
-    Router::post('/{group_id}/edit', 'App\Controller\Http\GroupController@edit');
+    Router::post('/{account_id}/update', 'App\Controller\Http\GroupController@update');
     // 删除群聊
     Router::delete('/{group_id}/delete', 'App\Controller\Http\GroupController@delete');
 

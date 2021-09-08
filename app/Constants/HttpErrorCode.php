@@ -384,4 +384,9 @@ class HttpErrorCode extends AbstractConstants
      * @Message("创建群聊失败")
      */
     const GROUP_CREATE_ERROR = 30001;
+
+    /**
+     * @Message("群聊不存在")
+     */
+    const GROUP_NOT_EXIST = 30002;
 }

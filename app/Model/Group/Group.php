@@ -4,6 +4,7 @@ declare (strict_types=1);
 namespace App\Model\Group;
 
 use App\Contract\RoomTypeInterface;
+use App\Helpers\AppHelper;
 use App\Helpers\CommonHelper;
 use App\Model\Model;
 use Carbon\Carbon;
@@ -71,13 +72,12 @@ class Group extends Model
 
     /**
      * 获取群组 ID
-     * @param $ident
-     * @param $authorization_id
+     * @param $group_id
      * @return int
      */
-    protected function getGroupId($ident, $authorization_id): int
+    protected function getGroupId($group_id): int
     {
-        return intval($this->where(['ident' => $ident, 'authorization_id' => $authorization_id, 'state' => self::STATE_OPEN])
+        return intval($this->where(['id' => $group_id, 'authorization_id' => AppHelper::getAuthorizationId(), 'state' => self::STATE_OPEN])
             ->whereNull('deleted_at')
             ->value('id'));
     }
@@ -85,36 +85,53 @@ class Group extends Model
     /**
      * 获取群聊信息
      * @param $group_id
-     * @param $authorization_id
      * @return \Hyperf\Database\Model\Builder|\Hyperf\Database\Model\Model|object|null
      */
-    protected function getGroupInfo($group_id, $authorization_id)
+    protected function getGroupInfo($group_id, $account_id = 0)
     {
-        return $this->where(['id' => $group_id, 'authorization_id' => $authorization_id, 'state' => self::STATE_OPEN])
-            ->whereNull('deleted_at')
-            ->first();
+        $builder = $this->where(['id' => $group_id, 'authorization_id' => AppHelper::getAuthorizationId(), 'state' => self::STATE_OPEN]);
+
+        if ($account_id) {
+            $builder->where('account_id', $account_id);
+        }
+
+        return $builder->whereNull('deleted_at')->first();
     }
 
     /**
      * 创建群聊
      * @param     $account_id
-     * @param     $authorization_id
      * @param     $name
      * @param     $cover
      * @param int $type
      * @return int
      */
-    protected function createGroup($account_id, $authorization_id, $name, $cover, $type = self::TYPE_PUBLIC): int
+    protected function createGroup($account_id, $name, $cover, $type = self::TYPE_PUBLIC): int
     {
         $ident = RoomTypeInterface::ROOM_TYPE_GROUP . CommonHelper::generateUniqid();
         return $this->insertGetId([
             'account_id' => $account_id,
-            'authorization_id' => $authorization_id,
+            'authorization_id' => AppHelper::getAuthorizationId(),
             'ident' => $ident,
             'name' => $name,
             'cover' => $cover,
             'type' => $type,
             'created_at' => Carbon::now(),
+        ]);
+    }
+
+    /**
+     * 修改群聊信息
+     * @param $id
+     * @param $name
+     * @param $cover
+     * @return int
+     */
+    protected function updateGroup($id, $name, $cover): int
+    {
+        return $this->where(['id' => $id])->update([
+            'name' => $name,
+            'cover' => $cover,
         ]);
     }
 

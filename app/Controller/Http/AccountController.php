@@ -45,16 +45,16 @@ class AccountController extends AbstractController
     }
 
     /**
-     * 添加用户账号
+     * 创建用户账号
      * @param AccountRequest $request
      * @return mixed
      */
-    public function add(AccountRequest $request)
+    public function create(AccountRequest $request)
     {
         $data = $request->validated();
 
         return $this->response->RESTfulAPI(
-            AccountService::getInstance()->add($data)
+            AccountService::getInstance()->create($data)
         );
     }
 
@@ -64,12 +64,12 @@ class AccountController extends AbstractController
      * @param AccountRequest $request
      * @return mixed
      */
-    public function edit($account_id, AccountRequest $request)
+    public function update($account_id, AccountRequest $request)
     {
         $data = $request->validated();
 
         return $this->response->RESTfulAPI(
-            AccountService::getInstance()->edit($account_id, $data)
+            AccountService::getInstance()->update($account_id, $data)
         );
     }
 

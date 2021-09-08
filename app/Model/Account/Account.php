@@ -3,6 +3,7 @@
 declare (strict_types=1);
 namespace App\Model\Account;
 
+use App\Helpers\AppHelper;
 use App\Model\Model;
 use Carbon\Carbon;
 
@@ -59,11 +60,11 @@ class Account extends Model
 
     /**
      * 获取账号ID
-     * @param     $authorization_id
      * @param int $account_id
+     * @param int $authorization_id
      * @return int
      */
-    protected function getAccountId($authorization_id, $account_id = 0): int
+    protected function getAccountId($account_id = 0, $authorization_id = 0): int
     {
         $builder = $this;
 
@@ -71,31 +72,29 @@ class Account extends Model
             $builder = $builder->where('id', $account_id);
         }
 
-        return intval($builder->where(['authorization_id' => $authorization_id, 'state' => self::STATE_OPEN])
+        return intval($builder->where(['authorization_id' => $authorization_id ?: AppHelper::getAuthorizationId(), 'state' => self::STATE_OPEN])
             ->value('id'));
     }
 
     /**
      * 通过应用ID 获取账号ID
      * @param $uid
-     * @param $authorization_id
      * @return int
      */
-    protected function getUidByAccountId($uid, $authorization_id): int
+    protected function getUidByAccountId($uid): int
     {
-        return intval($this->where(['uid' => $uid, 'authorization_id' => $authorization_id])
+        return intval($this->where(['uid' => $uid, 'authorization_id' => AppHelper::getAuthorizationId()])
             ->value('id'));
     }
 
     /**
      * 账号是否可用
      * @param $account_id
-     * @param $authorization_id
      * @return bool
      */
-    protected function isAccountAvailable($account_id, $authorization_id): bool
+    protected function isAccountAvailable($account_id): bool
     {
-        return $this->where(['id' => $account_id, 'authorization_id' => $authorization_id, 'state' => self::STATE_OPEN])
+        return $this->where(['id' => $account_id, 'authorization_id' => AppHelper::getAuthorizationId(), 'state' => self::STATE_OPEN])
             ->exists();
     }
 
@@ -106,21 +105,20 @@ class Account extends Model
      */
     protected function getAccount($account_id)
     {
-        return $this->where(['id' => $account_id])->first();
+        return $this->where(['id' => $account_id, 'authorization_id' => AppHelper::getAuthorizationId()])->first();
     }
 
     /**
      * 添加用户账号
-     * @param $authorization_id
      * @param $uid
      * @param $username
      * @param $avatar
      * @return int
      */
-    protected function addAccount($authorization_id, $uid, $username, $avatar): int
+    protected function addAccount($uid, $username, $avatar): int
     {
         return $this->insertGetId([
-            'authorization_id' => $authorization_id,
+            'authorization_id' => AppHelper::getAuthorizationId(),
             'uid' => $uid,
             'username' => $username,
             'avatar' => $avatar,
@@ -133,22 +131,47 @@ class Account extends Model
     /**
      * 重置用户账号
      * @param $account_id
-     * @param $authorization_id
      * @param $uid
      * @param $username
      * @param $avatar
      * @return int
      */
-    protected function resetAccount($account_id, $authorization_id, $uid, $username, $avatar): int
+    protected function resetAccount($account_id, $uid, $username, $avatar): int
     {
         return $this->where(['id' => $account_id])->update([
-            'authorization_id' => $authorization_id,
+            'authorization_id' => AppHelper::getAuthorizationId(),
             'uid' => $uid,
             'username' => $username,
             'avatar' => $avatar,
             'state' => self::STATE_OPEN,
             'created_at' => Carbon::now(),
             'deleted_at' => null,
+        ]);
+    }
+
+    /**
+     * @param $account_id
+     * @param $username
+     * @param $avatar
+     * @return int
+     */
+    protected function updateAccount($account_id, $username, $avatar): int
+    {
+        return $this->where(['id' => $account_id])->update([
+            'username' => $username,
+            'avatar' => $avatar,
+        ]);
+    }
+
+    /**
+     * @param $account_id
+     * @return int
+     */
+    protected function deleteAccount($account_id): int
+    {
+        return $this->where(['id' => $account_id])->update([
+            'state' => self::STATE_DELETE,
+            'deleted_at' => Carbon::now(),
         ]);
     }
 

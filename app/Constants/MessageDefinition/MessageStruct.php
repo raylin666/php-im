@@ -124,7 +124,7 @@ class MessageStruct implements MessageInterface
         return strval($this->roomType);
     }
 
-    public function withRoomId(string $roomId): MessageInterface
+    public function withRoomId(int $roomId): MessageInterface
     {
         // TODO: Implement withRoomId() method.
 
@@ -132,11 +132,11 @@ class MessageStruct implements MessageInterface
         return $this;
     }
 
-    public function getRoomId(): string
+    public function getRoomId(): int
     {
         // TODO: Implement getRoomId() method.
 
-        return strval($this->roomId);
+        return intval($this->roomId);
     }
 
     public function withFromAccountId(int $fromAccountId): MessageInterface

@@ -46,10 +46,10 @@ interface MessageInterface
 
     /**
      * 设置房间 ID
-     * @param string $roomId
+     * @param int $roomId
      * @return $this
      */
-    public function withRoomId(string $roomId): self;
+    public function withRoomId(int $roomId): self;
 
     /**
      * 设置发送者用户账号 ID
@@ -91,9 +91,9 @@ interface MessageInterface
 
     /**
      * 获取房间 ID
-     * @return string
+     * @return int
      */
-    public function getRoomId(): string;
+    public function getRoomId(): int;
 
     /**
      * 获取发送者用户账号 ID

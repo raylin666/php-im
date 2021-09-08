@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace App\Services\Account;
 
 use App\Constants\HttpErrorCode;
-use App\Helpers\AppHelper;
 use App\Model\Account\Account;
 use App\Model\Account\AccountAuthorization;
 use App\Services\Service;
@@ -32,8 +31,7 @@ class AccountService extends Service
      */
     public function info($account_id)
     {
-        $authorization_id = AppHelper::getAuthorizationId();
-        $account = $this->verifyAccountOrGet($account_id, $authorization_id);
+        $account = $this->verifyAccountOrGet($account_id);
         return $this->response()->success(Account::builderAccount($account));
     }
 
@@ -45,14 +43,13 @@ class AccountService extends Service
      */
     public function accountToken($account_id)
     {
-        $authorization_id = AppHelper::getAuthorizationId();
-        $account = $this->verifyAccountOrGet($account_id, $authorization_id);
+        $account = $this->verifyAccountOrGet($account_id);
 
-        $account_authorization_func = function ($account_id, $authorization_id) {
-            return AccountAuthorization::getAccountAuthorization($account_id, $authorization_id);
+        $account_authorization_func = function ($account_id) {
+            return AccountAuthorization::getAccountAuthorization($account_id);
         };
 
-        $account_authorization = $account_authorization_func($account_id, $authorization_id);
+        $account_authorization = $account_authorization_func($account_id);
         // 判断是否有用户账号授权
         if ($account_authorization) {
             $is_update = false;
@@ -65,13 +62,13 @@ class AccountService extends Service
 
             // 更新 Token
             if ($is_update) {
-                AccountAuthorization::updateTokenData($account_id, $authorization_id);
-                $account_authorization = $account_authorization_func($account_id, $authorization_id);
+                AccountAuthorization::updateTokenData($account_id);
+                $account_authorization = $account_authorization_func($account_id);
             }
         } else {
             // 生成用户账号授权数据
-            AccountAuthorization::addAccountAuthorization($account_id, $authorization_id);
-            $account_authorization = $account_authorization_func($account_id, $authorization_id);
+            AccountAuthorization::addAccountAuthorization($account_id);
+            $account_authorization = $account_authorization_func($account_id);
         }
 
         return $this->response()->success(
@@ -85,23 +82,22 @@ class AccountService extends Service
     }
 
     /**
-     * 添加用户账号
+     * 创建用户账号
      * @param array $data
      * @return array|mixed|void
      */
-    public function add(array $data)
+    public function create(array $data)
     {
         $data['uid'] = intval($data['uid']);
 
         $is_add = false;
-        $authorization_id = AppHelper::getAuthorizationId();
-        if ($account_id = Account::getUidByAccountId($data['uid'], $authorization_id)) {
-            if (Account::isAccountAvailable($account_id, $authorization_id)) {
+        if ($account_id = Account::getUidByAccountId($data['uid'])) {
+            if (Account::isAccountAvailable($account_id)) {
                 // 提示账号已存在
                 return $this->response()->error(HttpErrorCode::ACCOUNT_ALREADY_EXISTS);
             } else {
                 // 更新已被废弃的账号信息
-                if (! Account::resetAccount($account_id, $authorization_id, $data['uid'], $data['username'], $data['avatar'])) {
+                if (! Account::resetAccount($account_id, $data['uid'], $data['username'], $data['avatar'])) {
                     return $this->response()->error(HttpErrorCode::ACCOUNT_ADD_ERROR);
                 }
 
@@ -110,7 +106,7 @@ class AccountService extends Service
         }
 
         // 新增账号信息
-        if ((! $is_add) && (! ($account_id = Account::addAccount($authorization_id, $data['uid'], $data['username'], $data['avatar'])))) {
+        if ((! $is_add) && (! ($account_id = Account::addAccount($data['uid'], $data['username'], $data['avatar'])))) {
             return $this->response()->error(HttpErrorCode::ACCOUNT_ADD_ERROR);
         }
 
@@ -128,19 +124,15 @@ class AccountService extends Service
      * @param array $data
      * @return array|mixed|void
      */
-    public function edit($account_id, array $data)
+    public function update($account_id, array $data)
     {
-        $authorization_id = AppHelper::getAuthorizationId();
-        $account = $this->verifyAccountOrGet($account_id, $authorization_id);
+        $account = $this->verifyAccountOrGet($account_id);
         // 必须保证修改的数据 在业务层内 uid 相同
         if ($account['uid'] != $data['uid']) {
             return $this->response()->error(HttpErrorCode::ACCOUNT_UID_CANNOT_BE_MODIFIED);
         }
 
-        Account::where(['id' => $account_id])->update([
-            'username' => $data['username'],
-            'avatar' => $data['avatar'],
-        ]);
+        Account::updateAccount($account_id, $data['username'], $data['avatar']);
 
         return $this->response()->success();
     }
@@ -152,38 +144,22 @@ class AccountService extends Service
      */
     public function delete($account_id)
     {
-        $authorization_id = AppHelper::getAuthorizationId();
-        $this->verifyAccountOrGet($account_id, $authorization_id);
-
-        Account::where(['id' => $account_id])->update([
-            'state' => Account::STATE_DELETE,
-            'deleted_at' => Carbon::now(),
-        ]);
-
-        AccountAuthorization::where(['account_id' => $account_id, 'authorization_id' => $authorization_id])
-            ->whereNull('deleted_at')
-            ->update([
-                'deleted_at' => Carbon::now(),
-            ]);
-
+        $this->verifyAccountOrGet($account_id);
+        Account::deleteAccount($account_id);
+        AccountAuthorization::deleteAccountAuthorization($account_id);
         return $this->response()->success();
     }
 
     /**
      * 验证用户账号
      * @param $account_id
-     * @param $authorization_id
      * @return \Hyperf\Database\Model\Builder|\Hyperf\Database\Model\Model|object|void
      */
-    public function verifyAccountOrGet($account_id, $authorization_id)
+    public function verifyAccountOrGet($account_id)
     {
         $account = Account::getAccount($account_id);
         if (! $account) {
             return $this->response()->error(HttpErrorCode::ACCOUNT_NOT_AVAILABLE);
-        }
-
-        if ($account['authorization_id'] != $authorization_id) {
-            return $this->response()->error(HttpErrorCode::AUTHORIZATION_ACCOUNT_VERIFICATION_FAILED);
         }
 
         if ($account['state'] != Account::STATE_OPEN) {

@@ -16,6 +16,7 @@ use App\Request\Group\ApplyRequest;
 use App\Request\Group\CreateRequest;
 use App\Request\Group\PassedRequest;
 use App\Request\Group\RejectedRequest;
+use App\Request\Group\UpdateRequest;
 use App\Services\Account\GroupService;
 
 /**
@@ -48,6 +49,21 @@ class GroupController extends AbstractController
     {
         return $this->response->RESTfulAPI(
             GroupService::getInstance()->info($group_id)
+        );
+    }
+
+    /**
+     * 修改群信息
+     * @param UpdateRequest $request
+     * @param               $account_id
+     * @return mixed
+     */
+    public function update(UpdateRequest $request, $account_id)
+    {
+        $data = $request->validated();
+
+        return $this->response->RESTfulAPI(
+            GroupService::getInstance()->update($account_id, $data['group_id'], $data['name'], $data['cover'])
         );
     }
 

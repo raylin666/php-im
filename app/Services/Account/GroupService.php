@@ -33,21 +33,47 @@ class GroupService extends Service
      */
     public function create($account_id, $name, $cover, $type = Group::TYPE_PUBLIC)
     {
-        $authorization_id = AppHelper::getAuthorizationId();
-        AccountService::getInstance()->verifyAccountOrGet($account_id, $authorization_id);
-        $group_id = Group::createGroup($account_id, $authorization_id, $name, $cover, $type);
-        if ((! $group_id) || (! ($group = Group::getGroupInfo($group_id, $authorization_id)))) {
+        AccountService::getInstance()->verifyAccountOrGet($account_id);
+        $group_id = Group::createGroup($account_id, $name, $cover, $type);
+        if ((! $group_id) || (! ($group = Group::getGroupInfo($group_id, $account_id)))) {
             return $this->response()->error(HttpErrorCode::GROUP_CREATE_ERROR);
         }
 
         return $this->response()->success(Group::builderGroupInfo($group));
     }
 
+    /**
+     * 获取群信息
+     * @param $group_id
+     * @return array|mixed|void
+     */
     public function info($group_id)
     {
-        $authorization_id = AppHelper::getAuthorizationId();
-        if (! ($group = Group::getGroupInfo($group_id, $authorization_id))) {
-            return $this->response()->error(HttpErrorCode::GROUP_CREATE_ERROR);
+        if (! ($group = Group::getGroupInfo($group_id))) {
+            return $this->response()->error(HttpErrorCode::GROUP_NOT_EXIST);
+        }
+
+        return $this->response()->success(Group::builderGroupInfo($group));
+    }
+
+    /**
+     * 修改群信息
+     * @param $account_id
+     * @param $group_id
+     * @param $name
+     * @param $cover
+     * @return array|mixed|void
+     */
+    public function update($account_id, $group_id, $name, $cover)
+    {
+        AccountService::getInstance()->verifyAccountOrGet($account_id);
+        if (! ($group = Group::getGroupInfo($group_id, $account_id))) {
+            return $this->response()->error(HttpErrorCode::GROUP_NOT_EXIST);
+        }
+
+        if (Group::updateGroup($group_id, $name, $cover)) {
+            $group->name = $name;
+            $group->cover = $cover;
         }
 
         return $this->response()->success(Group::builderGroupInfo($group));
