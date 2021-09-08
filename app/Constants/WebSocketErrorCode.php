@@ -79,4 +79,14 @@ class WebSocketErrorCode extends AbstractConstants
      * @Message("Unsupported message type")
      */
     const WS_UNSUPPORTED_MESSAGE_TYPE = 20003;
+
+    /**
+     * @Message("不是有效群组")
+     */
+    const WS_GROUP_NOT_VALID = 30001;
+
+    /**
+     * @Message("不是该群组成员")
+     */
+    const WS_ACCOUNT_NOT_GROUP_MEMBER = 30002;
 }

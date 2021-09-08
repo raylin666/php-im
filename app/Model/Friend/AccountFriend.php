@@ -130,4 +130,16 @@ class AccountFriend extends Model
 
         return true;
     }
+
+    /**
+     * 获取单聊唯一标识
+     * @param $account_id
+     * @param $to_account_id
+     * @return string|null
+     */
+    protected function getIdent($account_id, $to_account_id): ?string
+    {
+        return $this->where(['account_id' => $account_id, 'to_account_id' => $to_account_id, 'state' => self::STATE_OPEN])
+            ->value('ident');
+    }
 }

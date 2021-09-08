@@ -3,7 +3,9 @@
 declare (strict_types=1);
 namespace App\Model\Message;
 
+use App\Model\Friend\AccountFriend;
 use App\Model\Model;
+use Carbon\Carbon;
 
 /**
  * @property int $id 
@@ -38,4 +40,35 @@ class C2cMessage extends Model
      * @var array
      */
     protected $casts = ['id' => 'integer', 'from_account_id' => 'integer', 'to_account_id' => 'integer', 'state' => 'integer', 'is_system' => 'integer', 'created_at' => 'datetime'];
+
+    /**
+     * 添加消息
+     * @param             $from_account_id
+     * @param             $to_account_id
+     * @param             $message_type
+     * @param             $message_content
+     * @param Carbon|null $send_at
+     * @param bool        $is_system
+     * @return int
+     */
+    protected function addMessage(
+        $from_account_id,
+        $to_account_id,
+        $message_type,
+        $message_content,
+        ?Carbon $send_at = null,
+        bool $is_system = false
+    )
+    {
+        return $this->insertGetId([
+            'ident' => AccountFriend::getIdent($from_account_id, $to_account_id),
+            'from_account_id' => $from_account_id,
+            'to_account_id' => $to_account_id,
+            'message_type' => $message_type,
+            'message_content' => strval($message_content),
+            'is_system' => intval($is_system),
+            'created_at' => Carbon::now(),
+            'send_at' => $send_at instanceof Carbon ? $send_at : Carbon::now(),
+        ]);
+    }
 }

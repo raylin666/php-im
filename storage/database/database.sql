@@ -38,6 +38,50 @@ CREATE TABLE `im_account_friend_apply` (
  UNIQUE KEY `uk_account_to` (`account_id`,`to_account_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户账号好友申请表';
 
+CREATE TABLE `im_group` (
+    `id` bigint(19) unsigned NOT NULL AUTO_INCREMENT,
+    `account_id` bigint(19) unsigned NOT NULL DEFAULT '0' COMMENT '创建者用户账号ID',
+    `ident` varchar(25) NOT NULL COMMENT '群聊唯一标识',
+    `name` varchar(20) NOT NULL DEFAULT '' COMMENT '群昵称',
+    `cover` varchar(255) NOT NULL DEFAULT '' COMMENT '群头像',
+    `type` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '群类型 0:普通 1:讨论组',
+    `state` tinyint(1) unsigned NOT NULL DEFAULT '1' COMMENT '状态 0:关闭 1:开启 2:删除',
+    `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `deleted_at` datetime DEFAULT NULL COMMENT '删除时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_ident` (`ident`) USING BTREE,
+    KEY `un_account_ident` (`account_id`, `ident`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='群聊信息表';
+
+CREATE TABLE `im_group_account_apply` (
+    `id` bigint(19) unsigned NOT NULL AUTO_INCREMENT,
+    `group_id` bigint(19) unsigned NOT NULL DEFAULT '0' COMMENT '群ID',
+    `account_id` bigint(19) unsigned NOT NULL DEFAULT '0' COMMENT '用户账号ID',
+    `operated_account_id` bigint(19) unsigned NOT NULL DEFAULT '0' COMMENT '操作者用户账号ID',
+    `apply_remark` varchar(30) NOT NULL DEFAULT '' COMMENT '申请入群备注',
+    `state` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '状态 0:待审核 1:已通过 2:已拒绝',
+    `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `operated_at` datetime DEFAULT NULL COMMENT '操作时间 (通过或拒绝)',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_account_group` (`account_id`,`group_id`) USING BTREE,
+    KEY `idx_group` (`group_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='群聊成员申请入群表';
+
+CREATE TABLE `im_group_account` (
+ `id` bigint(19) unsigned NOT NULL AUTO_INCREMENT,
+ `group_id` bigint(19) unsigned NOT NULL DEFAULT '0' COMMENT '群ID',
+ `account_id` bigint(19) unsigned NOT NULL DEFAULT '0' COMMENT '用户账号ID',
+ `to_account_remark` varchar(20) NOT NULL DEFAULT '' COMMENT '群成员名称备注',
+ `group_remark` varchar(20) NOT NULL DEFAULT '' COMMENT '群名称备注',
+ `identity` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '群成员身份 0:普通 1:管理员 2:群主',
+ `state` tinyint(1) unsigned NOT NULL DEFAULT '1' COMMENT '状态 0:关闭 1:开启 2:删除',
+ `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+ `deleted_at` datetime DEFAULT NULL COMMENT '删除时间',
+ PRIMARY KEY (`id`),
+ UNIQUE KEY `uk_account_group` (`account_id`,`group_id`) USING BTREE,
+ KEY `idx_group` (`group_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='群聊成员表';
+
 CREATE TABLE `im_authorization` (
   `id` bigint(19) unsigned NOT NULL AUTO_INCREMENT,
   `app` varchar(36) NOT NULL COMMENT '使用应用名称',
@@ -82,5 +126,22 @@ CREATE TABLE `im_c2c_message` (
    PRIMARY KEY (`id`),
    KEY `uk_account_to` (`from_account_id`,`to_account_id`) USING BTREE,
    KEY `idx_ident` (`ident`) USING BTREE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='C2C消息记录表';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='C2C 单聊消息记录表';
+
+CREATE TABLE `im_group_message` (
+  `id` bigint(19) unsigned NOT NULL AUTO_INCREMENT,
+  `group_id` bigint(19) unsigned NOT NULL DEFAULT '0' COMMENT '群ID',
+  `from_account_id` bigint(19) unsigned NOT NULL DEFAULT '0' COMMENT '发送者用户账号ID',
+  `message_type` varchar(20) NOT NULL DEFAULT '' COMMENT '消息类型',
+  `message_content` text COMMENT '消息内容',
+  `state` tinyint(1) unsigned NOT NULL DEFAULT '1' COMMENT '状态 0:隐藏 1:显示 2:撤回',
+  `is_system` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '是否系统消息 0:否 1:是',
+  `identity` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '群成员身份 0:普通 1:管理员 2:群主',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `send_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '发送时间',
+  `deleted_at` datetime DEFAULT NULL COMMENT '删除时间',
+  PRIMARY KEY (`id`),
+  KEY `uk_group_account` (`group_id`,`from_account_id`) USING BTREE,
+  KEY `idx_account` (`from_account_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='GROUP 群聊消息记录表';
 
