@@ -7,10 +7,11 @@ use App\Model\Model;
 use Carbon\Carbon;
 
 /**
- * @property int $id 
- * @property int $authorization_id 
- * @property string $username 
- * @property string $avatar 
+ * @property int $id
+ * @property int $authorization_id
+ * @property string $username
+ * @property string $uid
+ * @property string $avatar
  * @property int $state 
  * @property \Carbon\Carbon $created_at 
  * @property int $deleted_at 
@@ -89,11 +90,13 @@ class Account extends Model
     /**
      * 账号是否可用
      * @param $account_id
+     * @param $authorization_id
      * @return bool
      */
-    protected function isAccountAvailable($account_id): bool
+    protected function isAccountAvailable($account_id, $authorization_id): bool
     {
-        return $this->where(['id' => $account_id, 'state' => self::STATE_OPEN])->exists();
+        return $this->where(['id' => $account_id, 'authorization_id' => $authorization_id, 'state' => self::STATE_OPEN])
+            ->exists();
     }
 
     /**
@@ -156,12 +159,12 @@ class Account extends Model
     protected function builderAccount(Account $account): array
     {
         return [
-            'id' => $account['id'],
-            'authorization_id' => $account['authorization_id'],
-            'uid' => $account['uid'],
-            'username' => $account['username'],
-            'avatar' => $account['avatar'],
-            'created_at' => $account['created_at'],
+            'id' => $account->id,
+            'authorization_id' => $account->authorization_id,
+            'uid' => $account->uid,
+            'username' => $account->username,
+            'avatar' => $account->avatar,
+            'created_at' => $account->created_at,
         ];
     }
 }

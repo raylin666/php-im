@@ -82,8 +82,8 @@ class AccountFriend extends Model
                 $query->where(['account_id' => $account_id, 'to_account_id' => $to_account_id])
                     ->orWhere(['account_id' => $to_account_id, 'to_account_id' => $account_id]);
             })
-            ->where('state', self::STATE_OPEN)
-            ->count() > 1;
+                ->where('state', self::STATE_OPEN)
+                ->count() > 1;
     }
 
     /**
@@ -129,6 +129,26 @@ class AccountFriend extends Model
         );
 
         return true;
+    }
+
+    /**
+     * 删除好友关系
+     * @param $account_id
+     * @param $to_account_id
+     */
+    protected function deleteFriendRelation($account_id, $to_account_id)
+    {
+        $this->where(['account_id' => $account_id, 'to_account_id' => $to_account_id])
+            ->update([
+                'state' => self::STATE_DELETE,
+                'deleted_at' => Carbon::now(),
+            ]);
+
+        $this->where(['account_id' => $to_account_id, 'to_account_id' => $account_id])
+            ->update([
+                'state' => self::STATE_DELETE,
+                'deleted_at' => Carbon::now(),
+            ]);
     }
 
     /**

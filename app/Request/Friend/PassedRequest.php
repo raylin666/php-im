@@ -6,7 +6,7 @@ namespace App\Request\Friend;
 
 use Hyperf\Validation\Request\FormRequest;
 
-class PassedFriendRequest extends FormRequest
+class PassedRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

@@ -41,6 +41,7 @@ CREATE TABLE `im_account_friend_apply` (
 CREATE TABLE `im_group` (
     `id` bigint(19) unsigned NOT NULL AUTO_INCREMENT,
     `account_id` bigint(19) unsigned NOT NULL DEFAULT '0' COMMENT '创建者用户账号ID',
+    `authorization_id` bigint(19) unsigned NOT NULL DEFAULT '0' COMMENT '授权ID',
     `ident` varchar(25) NOT NULL COMMENT '群聊唯一标识',
     `name` varchar(20) NOT NULL DEFAULT '' COMMENT '群昵称',
     `cover` varchar(255) NOT NULL DEFAULT '' COMMENT '群头像',
@@ -50,7 +51,7 @@ CREATE TABLE `im_group` (
     `deleted_at` datetime DEFAULT NULL COMMENT '删除时间',
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_ident` (`ident`) USING BTREE,
-    KEY `un_account_ident` (`account_id`, `ident`) USING BTREE
+    KEY `un_account_authorization_ident` (`account_id`, `authorization_id`, `ident`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='群聊信息表';
 
 CREATE TABLE `im_group_account_apply` (

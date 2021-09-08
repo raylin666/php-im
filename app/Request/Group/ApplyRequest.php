@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Request\Friend;
+namespace App\Request\Group;
 
 use Hyperf\Validation\Request\FormRequest;
 
-class ApplyFriendRequest extends FormRequest
+class ApplyRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,7 +22,7 @@ class ApplyFriendRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'to_account_id' => 'required|numeric',
+            'account_id' => 'required|numeric',
             'remark' => 'string|max:20',
         ];
     }

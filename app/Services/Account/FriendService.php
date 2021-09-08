@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Services\Account;
 
+use App\Helpers\AppHelper;
 use Exception;
 use App\Constants\HttpErrorCode;
 use App\Model\Account\Account;
@@ -39,8 +40,10 @@ class FriendService extends Service
             return $this->response()->error(HttpErrorCode::TO_ACCOUNT_JOIN_FRIEND_NOT_ME);
         }
 
+        $authorization_id = AppHelper::getAuthorizationId();
+
         // 对方用户账号是否可用
-        if (! Account::isAccountAvailable($to_account_id)) {
+        if (! Account::isAccountAvailable($to_account_id, $authorization_id)) {
             return $this->response()->error(HttpErrorCode::ACCOUNT_NOT_EXIST);
         }
 
@@ -79,8 +82,10 @@ class FriendService extends Service
             return $this->response()->error(HttpErrorCode::TO_ACCOUNT_JOIN_FRIEND_NOT_ME);
         }
 
+        $authorization_id = AppHelper::getAuthorizationId();
+
         // 对方用户账号是否可用
-        if (! Account::isAccountAvailable($from_account_id)) {
+        if (! Account::isAccountAvailable($from_account_id, $authorization_id)) {
             return $this->response()->error(HttpErrorCode::ACCOUNT_OTHER_NOT_AVAILABLE);
         }
 
@@ -132,6 +137,18 @@ class FriendService extends Service
         }
 
         AccountFriendApply::rejectedAccountFriendApply($apply['id']);
+        return $this->response()->success();
+    }
+
+    /**
+     * 删除好友
+     * @param $account_id
+     * @param $to_account_id
+     * @return array|mixed
+     */
+    public function delete($account_id, $to_account_id)
+    {
+        AccountFriend::deleteFriendRelation($account_id, $to_account_id);
         return $this->response()->success();
     }
 }

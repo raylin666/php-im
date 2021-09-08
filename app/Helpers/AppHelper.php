@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Helpers;
 
+use App\Swoole\Table\IMGroupTable;
 use Hyperf\Contract\StdoutLoggerInterface;
 use Throwable;
 use App\Repository\AchieveClass\AccountToken;
@@ -104,6 +105,15 @@ class AppHelper extends Helper
     protected function getIMTable()
     {
         return $this->getContainer()->get(IMTable::class);
+    }
+
+    /**
+     * 获取 IM Group Table 表
+     * @return IMGroupTable|mixed
+     */
+    protected function getIMGroupTable()
+    {
+        return $this->getContainer()->get(IMGroupTable::class);
     }
 
     /**

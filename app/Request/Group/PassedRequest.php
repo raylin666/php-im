@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Request\Friend;
+namespace App\Request\Group;
 
 use Hyperf\Validation\Request\FormRequest;
 
-class RejectedFriendRequest extends FormRequest
+class PassedRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

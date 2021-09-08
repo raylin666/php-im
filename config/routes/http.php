@@ -39,4 +39,26 @@ Router::addGroup('/friend', function () {
     Router::post('/{account_id}/passed', 'App\Controller\Http\FriendController@passed');
     // 拒绝添加好友
     Router::post('/{account_id}/rejected', 'App\Controller\Http\FriendController@rejected');
+    // 删除好友
+    Router::delete('/{account_id}/delete', 'App\Controller\Http\FriendController@delete');
+});
+
+Router::addGroup('/group', function () {
+    // 创建群聊
+    Router::put('/{account_id}/create', 'App\Controller\Http\GroupController@create');
+    // 获取群信息
+    Router::get('/{group_id}/info', 'App\Controller\Http\GroupController@info');
+    // 修改群信息
+    Router::post('/{group_id}/edit', 'App\Controller\Http\GroupController@edit');
+    // 删除群聊
+    Router::delete('/{group_id}/delete', 'App\Controller\Http\GroupController@delete');
+
+    // 申请加入群聊
+    Router::post('/{group_id}/apply', 'App\Controller\Http\GroupController@apply');
+    // 确认加入群聊
+    Router::post('/{group_id}/passed', 'App\Controller\Http\GroupController@passed');
+    // 拒绝加入群聊
+    Router::post('/{group_id}/rejected', 'App\Controller\Http\GroupController@rejected');
+    // 退出群聊
+    Router::post('/{account_id}/quit', 'App\Controller\Http\GroupController@quit');
 });

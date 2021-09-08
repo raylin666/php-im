@@ -22,5 +22,7 @@ class ServerStartCallback extends \Hyperf\Framework\Bootstrap\ServerStartCallbac
     {
         // 创建 IM Table 表
         AppHelper::getIMTable()->create(65536);
+        // 创建 IM Group Table 表
+        AppHelper::getIMGroupTable()->create(65536);
     }
 }

@@ -379,4 +379,9 @@ class HttpErrorCode extends AbstractConstants
      * @Message("不存在的申请好友ID")
      */
     const TO_ACCOUNT_NOT_JOIN_FRIEND = 10012;
+
+    /**
+     * @Message("创建群聊失败")
+     */
+    const GROUP_CREATE_ERROR = 30001;
 }

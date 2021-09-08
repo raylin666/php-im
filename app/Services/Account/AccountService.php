@@ -34,7 +34,7 @@ class AccountService extends Service
     {
         $authorization_id = AppHelper::getAuthorizationId();
         $account = $this->verifyAccountOrGet($account_id, $authorization_id);
-        return Account::builderAccount($account);
+        return $this->response()->success(Account::builderAccount($account));
     }
 
     /**
@@ -96,7 +96,7 @@ class AccountService extends Service
         $is_add = false;
         $authorization_id = AppHelper::getAuthorizationId();
         if ($account_id = Account::getUidByAccountId($data['uid'], $authorization_id)) {
-            if (Account::isAccountAvailable($account_id)) {
+            if (Account::isAccountAvailable($account_id, $authorization_id)) {
                 // 提示账号已存在
                 return $this->response()->error(HttpErrorCode::ACCOUNT_ALREADY_EXISTS);
             } else {
@@ -175,7 +175,7 @@ class AccountService extends Service
      * @param $authorization_id
      * @return \Hyperf\Database\Model\Builder|\Hyperf\Database\Model\Model|object|void
      */
-    private function verifyAccountOrGet($account_id, $authorization_id)
+    public function verifyAccountOrGet($account_id, $authorization_id)
     {
         $account = Account::getAccount($account_id);
         if (! $account) {
