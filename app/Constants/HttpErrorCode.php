@@ -389,4 +389,29 @@ class HttpErrorCode extends AbstractConstants
      * @Message("群聊不存在")
      */
     const GROUP_NOT_EXIST = 30002;
+
+    /**
+     * @Message("用户已是群成员")
+     */
+    const GROUP_ACCOUNT_ALREADY_EXIST = 30003;
+
+    /**
+     * @Message("您的入群申请已发送, 请不要多次申请")
+     */
+    const GROUP_ACCOUNT_JOIN_BE_CONFIRM = 30004;
+
+    /**
+     * @Message("申请添加对方为好友失败")
+     */
+    const GROUP_ACCOUNT_JOIN_ERROR = 30005;
+
+    /**
+     * @Message("不存在的申请入群ID")
+     */
+    const GROUP_ACCOUNT_JOIN_FRIEND = 30006;
+
+    /**
+     * @Message("您没有操作该群权限")
+     */
+    const GROUP_ACCOUNT_NOT_OPERATED_AUTH = 30007;
 }

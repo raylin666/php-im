@@ -103,9 +103,9 @@ class AccountFriend extends Model
                 'to_account_id' => $to_account_id,
             ],
             [
-                'ident' => $room_ident,
                 'account_id' => $from_account_id,
                 'to_account_id' => $to_account_id,
+                'ident' => $room_ident,
                 'state' => self::STATE_OPEN,
                 'created_at' => Carbon::now(),
                 'deleted_at' => null,

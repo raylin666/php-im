@@ -11,8 +11,10 @@ declare(strict_types=1);
  */
 namespace App\Services;
 
+use App\Constants\HttpErrorCode;
 use App\Dependencies\Response;
 use App\Helpers\AppHelper;
+use App\Model\Account\Account;
 
 /**
  * Class Service
@@ -44,5 +46,24 @@ abstract class Service
     protected function response()
     {
         return AppHelper::getResponse();
+    }
+
+    /**
+     * 验证用户账号是否可用, 返回可用用户账号信息
+     * @param $account_id
+     * @return \Hyperf\Database\Model\Builder|\Hyperf\Database\Model\Model|object|void
+     */
+    protected function verifyAccountOrGet($account_id)
+    {
+        $account = Account::getAccount($account_id);
+        if (! $account) {
+            return $this->response()->error(HttpErrorCode::ACCOUNT_NOT_AVAILABLE);
+        }
+
+        if ($account['state'] != Account::STATE_OPEN) {
+            return $this->response()->error(HttpErrorCode::ACCOUNT_NOT_AVAILABLE);
+        }
+
+        return $account;
     }
 }

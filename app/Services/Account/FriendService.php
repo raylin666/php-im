@@ -11,7 +11,6 @@ declare(strict_types=1);
  */
 namespace App\Services\Account;
 
-use App\Helpers\AppHelper;
 use Exception;
 use App\Constants\HttpErrorCode;
 use App\Model\Account\Account;
@@ -77,11 +76,13 @@ class FriendService extends Service
         $is_friend = false;
 
         if ($account_id == $from_account_id) {
+            $this->rejected($account_id, $from_account_id);
             return $this->response()->error(HttpErrorCode::TO_ACCOUNT_JOIN_FRIEND_NOT_ME);
         }
 
         // 对方用户账号是否可用
         if (! Account::isAccountAvailable($from_account_id)) {
+            $this->rejected($account_id, $from_account_id);
             return $this->response()->error(HttpErrorCode::ACCOUNT_OTHER_NOT_AVAILABLE);
         }
 
@@ -128,11 +129,10 @@ class FriendService extends Service
     public function rejected($account_id, $from_account_id)
     {
         // 获取未确认的消息
-        if (! ($apply = AccountFriendApply::getBeConfirm($from_account_id, $account_id))) {
-            return $this->response()->error(HttpErrorCode::TO_ACCOUNT_NOT_JOIN_FRIEND);
+        if ($apply = AccountFriendApply::getBeConfirm($from_account_id, $account_id)) {
+            AccountFriendApply::rejectedAccountFriendApply($apply['id']);
         }
 
-        AccountFriendApply::rejectedAccountFriendApply($apply['id']);
         return $this->response()->success();
     }
 

@@ -23,6 +23,7 @@ class RejectedRequest extends FormRequest
     {
         return [
             'from_account_id' => 'required|numeric',
+            'operated_account_id' => 'required|numeric',
         ];
     }
 }

@@ -139,7 +139,6 @@ class Account extends Model
     protected function resetAccount($account_id, $uid, $username, $avatar): int
     {
         return $this->where(['id' => $account_id])->update([
-            'authorization_id' => AppHelper::getAuthorizationId(),
             'uid' => $uid,
             'username' => $username,
             'avatar' => $avatar,

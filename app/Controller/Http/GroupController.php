@@ -14,6 +14,7 @@ namespace App\Controller\Http;
 use App\Controller\AbstractController;
 use App\Request\Group\ApplyRequest;
 use App\Request\Group\CreateRequest;
+use App\Request\Group\DeleteRequest;
 use App\Request\Group\PassedRequest;
 use App\Request\Group\RejectedRequest;
 use App\Request\Group\UpdateRequest;
@@ -68,6 +69,21 @@ class GroupController extends AbstractController
     }
 
     /**
+     * 删除群聊
+     * @param DeleteRequest $request
+     * @param               $group_id
+     * @return mixed
+     */
+    public function delete(DeleteRequest $request, $group_id)
+    {
+        $data = $request->validated();
+
+        return $this->response->RESTfulAPI(
+            GroupService::getInstance()->delete($group_id, $data['account_id'])
+        );
+    }
+
+    /**
      * 申请加入群聊
      * @param ApplyRequest $request
      * @param              $group_id
@@ -78,7 +94,7 @@ class GroupController extends AbstractController
         $data = $request->validated();
 
         return $this->response->RESTfulAPI(
-            GroupService::getInstance()->apply($group_id, $data['account_id'], $data['remark'])
+            GroupService::getInstance()->apply($group_id, $data['account_id'], $data['remark'] ?? '')
         );
     }
 
@@ -93,7 +109,7 @@ class GroupController extends AbstractController
         $data = $request->validated();
 
         return $this->response->RESTfulAPI(
-            GroupService::getInstance()->passed($group_id, $data['from_account_id'])
+            GroupService::getInstance()->passed($group_id, $data['from_account_id'], $data['operated_account_id'])
         );
     }
 
@@ -108,7 +124,7 @@ class GroupController extends AbstractController
         $data = $request->validated();
 
         return $this->response->RESTfulAPI(
-            GroupService::getInstance()->rejected($group_id, $data['from_account_id'])
+            GroupService::getInstance()->rejected($group_id, $data['from_account_id'], $data['operated_account_id'])
         );
     }
 }

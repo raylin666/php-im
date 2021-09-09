@@ -4,6 +4,7 @@ declare (strict_types=1);
 namespace App\Model\Group;
 
 use App\Model\Model;
+use Carbon\Carbon;
 
 /**
  * @property int $id 
@@ -58,6 +59,16 @@ class GroupAccount extends Model
     const STATE_DELETE = 2;
 
     /**
+     * 群成员身份
+     */
+    // 普通
+    const IDENTITY_PUBLIC = 0;
+    // 管理员
+    const IDENTITY_ADMIN = 1;
+    // 群主
+    const IDENTITY_HOST = 2;
+
+    /**
      * 用户账号是否群成员
      * @param $account_id
      * @param $group_id
@@ -68,5 +79,54 @@ class GroupAccount extends Model
         return $this->where(['account_id' => $account_id, 'group_id' => $group_id, 'state' => self::STATE_OPEN])
             ->whereNull('deleted_at')
             ->exists();
+    }
+
+    /**
+     * 群成员是否群主或管理员
+     * @param $account_id
+     * @param $group_id
+     * @return bool
+     */
+    protected function isGroupAccountIdentityHostOrAdmin($account_id, $group_id): bool
+    {
+        return $this->where(['account_id' => $account_id, 'group_id' => $group_id, 'state' => self::STATE_OPEN])
+            ->whereIn('identity', [self::IDENTITY_ADMIN, self::IDENTITY_HOST])
+            ->whereNull('deleted_at')
+            ->exists();
+    }
+
+    /**
+     * 群成员绑定
+     * @param     $account_id
+     * @param     $group_id
+     * @param int $identity
+     * @return bool
+     */
+    protected function bindGroupAccountRelation($account_id, $group_id, $identity = self::IDENTITY_PUBLIC): bool
+    {
+        if (! in_array($identity, [
+            self::IDENTITY_HOST,
+            self::IDENTITY_ADMIN,
+            self::IDENTITY_PUBLIC
+        ])) {
+            $identity = self::IDENTITY_PUBLIC;
+        }
+
+        $this->updateOrInsert(
+            [
+                'account_id' => $account_id,
+                'group_id' => $group_id,
+            ],
+            [
+                'account_id' => $account_id,
+                'group_id' => $group_id,
+                'identity' => $identity,
+                'state' => self::STATE_OPEN,
+                'created_at' => Carbon::now(),
+                'deleted_at' => null,
+            ]
+        );
+
+        return true;
     }
 }

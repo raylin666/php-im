@@ -6,7 +6,7 @@ namespace App\Request\Group;
 
 use Hyperf\Validation\Request\FormRequest;
 
-class PassedRequest extends FormRequest
+class DeleteRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,8 +22,7 @@ class PassedRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'from_account_id' => 'required|numeric',
-            'operated_account_id' => 'required|numeric',
+            'account_id' => 'required|numeric',
         ];
     }
 }

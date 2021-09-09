@@ -11,10 +11,14 @@ declare(strict_types=1);
  */
 namespace App\Services\Account;
 
+use Exception;
 use App\Constants\HttpErrorCode;
-use App\Helpers\AppHelper;
+use App\Model\Account\Account;
 use App\Model\Group\Group;
+use App\Model\Group\GroupAccount;
+use App\Model\Group\GroupAccountApply;
 use App\Services\Service;
+use Hyperf\DbConnection\Db;
 
 /**
  * Class GroupService
@@ -33,7 +37,7 @@ class GroupService extends Service
      */
     public function create($account_id, $name, $cover, $type = Group::TYPE_PUBLIC)
     {
-        AccountService::getInstance()->verifyAccountOrGet($account_id);
+        $this->verifyAccountOrGet($account_id);
         $group_id = Group::createGroup($account_id, $name, $cover, $type);
         if ((! $group_id) || (! ($group = Group::getGroupInfo($group_id, $account_id)))) {
             return $this->response()->error(HttpErrorCode::GROUP_CREATE_ERROR);
@@ -66,9 +70,14 @@ class GroupService extends Service
      */
     public function update($account_id, $group_id, $name, $cover)
     {
-        AccountService::getInstance()->verifyAccountOrGet($account_id);
-        if (! ($group = Group::getGroupInfo($group_id, $account_id))) {
+        $this->verifyAccountOrGet($account_id);
+        if (! ($group = Group::getGroupInfo($group_id))) {
             return $this->response()->error(HttpErrorCode::GROUP_NOT_EXIST);
+        }
+
+        // 判断是否有权限操作
+        if (! GroupAccount::isGroupAccountIdentityHostOrAdmin($account_id, $group_id)) {
+            return $this->response()->error(HttpErrorCode::GROUP_ACCOUNT_NOT_OPERATED_AUTH);
         }
 
         if (Group::updateGroup($group_id, $name, $cover)) {
@@ -77,6 +86,22 @@ class GroupService extends Service
         }
 
         return $this->response()->success(Group::builderGroupInfo($group));
+    }
+
+    public function delete($group_id, $account_id)
+    {
+        $this->verifyAccountOrGet($account_id);
+
+        // 判断是否有权限操作
+        if (! GroupAccount::isGroupAccountIdentityHostOrAdmin($account_id, $group_id)) {
+            return $this->response()->error(HttpErrorCode::GROUP_ACCOUNT_NOT_OPERATED_AUTH);
+        }
+
+        // 判断是否该用户群 并且群聊是否可用
+
+        // 移除所有群内成员
+
+        // 删除群组
     }
 
     /**
@@ -88,28 +113,103 @@ class GroupService extends Service
      */
     public function apply($group_id, $account_id, string $remark = '')
     {
+        $this->verifyAccountOrGet($account_id);
 
+        // 判断群聊是否可用
+        if (! Group::getGroupId($group_id)) {
+            return $this->response()->error(HttpErrorCode::GROUP_NOT_EXIST);
+        }
+
+        // 判断用户是否在群内
+        if (GroupAccount::isGroupAccount($account_id, $group_id)) {
+            return $this->response()->error(HttpErrorCode::GROUP_ACCOUNT_ALREADY_EXIST);
+        }
+
+        // 判断是否已有未确认的入群消息
+        if (GroupAccountApply::isExistBeConfirm($account_id, $group_id)) {
+            return $this->response()->error(HttpErrorCode::GROUP_ACCOUNT_JOIN_BE_CONFIRM);
+        }
+
+        // 写入入群消息
+        if (! ($apply_id = GroupAccountApply::addGroupAccountApply($account_id, $group_id, $remark))) {
+            return $this->response()->error(HttpErrorCode::GROUP_ACCOUNT_JOIN_ERROR);
+        }
+
+        return $this->response()->success([
+            'apply_id' => $apply_id,
+        ]);
     }
 
     /**
-     * 确认添加好友
+     * 确认加入群聊
      * @param        $group_id
      * @param        $from_account_id
+     * @param        $operated_account_id
      * @return array|mixed|void
      */
-    public function passed($group_id, $from_account_id)
+    public function passed($group_id, $from_account_id, $operated_account_id)
     {
+        $is_join = false;
 
+        // 判断操作人是否有权限操作
+        if (! GroupAccount::isGroupAccountIdentityHostOrAdmin($operated_account_id, $group_id)) {
+            return $this->response()->error(HttpErrorCode::GROUP_ACCOUNT_NOT_OPERATED_AUTH);
+        }
+
+        // 对方用户账号是否可用
+        if (! Account::isAccountAvailable($from_account_id)) {
+            $this->rejected($group_id, $from_account_id);
+            return $this->response()->error(HttpErrorCode::ACCOUNT_OTHER_NOT_AVAILABLE);
+        }
+
+        // 获取未确认的消息
+        if (! ($apply = GroupAccountApply::getBeConfirm($from_account_id, $group_id))) {
+            return $this->response()->error(HttpErrorCode::GROUP_ACCOUNT_JOIN_FRIEND);
+        }
+
+        // 判断用户是否在群内
+        if (GroupAccount::isGroupAccount($from_account_id, $group_id)) {
+            $is_join = true;
+        }
+
+        Db::beginTransaction();
+
+        try {
+            // 通过入群申请
+            if (! GroupAccountApply::passedGroupAccountApply($apply['id'], $operated_account_id)) {
+                throw new Exception('Failed to apply for joining the group');
+            }
+
+            if (! $is_join) {
+                // 群成员绑定
+                if (! GroupAccount::bindGroupAccountRelation($from_account_id, $group_id)) {
+                    throw new Exception('Group membership binding failed');
+                }
+            }
+
+            Db::commit();
+
+        } catch (Exception $e) {
+            Db::rollBack();
+        }
+
+        return $this->response()->success();
     }
 
     /**
-     * 拒绝添加好友
+     * 拒绝加入群聊
      * @param $group_id
      * @param $from_account_id
+     * @param $operated_account_id
      * @return array|mixed|void
      */
-    public function rejected($group_id, $from_account_id)
+    public function rejected($group_id, $from_account_id, $operated_account_id)
     {
+        // 获取未确认的消息
+        if ($apply = GroupAccountApply::getBeConfirm($from_account_id, $group_id)) {
+            GroupAccountApply::rejectedGroupAccountApply($apply['id'], $operated_account_id);
+        }
 
+        return $this->response()->success();
     }
 }

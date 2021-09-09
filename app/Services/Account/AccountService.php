@@ -149,23 +149,4 @@ class AccountService extends Service
         AccountAuthorization::deleteAccountAuthorization($account_id);
         return $this->response()->success();
     }
-
-    /**
-     * 验证用户账号
-     * @param $account_id
-     * @return \Hyperf\Database\Model\Builder|\Hyperf\Database\Model\Model|object|void
-     */
-    public function verifyAccountOrGet($account_id)
-    {
-        $account = Account::getAccount($account_id);
-        if (! $account) {
-            return $this->response()->error(HttpErrorCode::ACCOUNT_NOT_AVAILABLE);
-        }
-
-        if ($account['state'] != Account::STATE_OPEN) {
-            return $this->response()->error(HttpErrorCode::ACCOUNT_NOT_AVAILABLE);
-        }
-
-        return $account;
-    }
 }

@@ -3,11 +3,13 @@
 declare (strict_types=1);
 namespace App\Model\Group;
 
+use Exception;
 use App\Contract\RoomTypeInterface;
 use App\Helpers\AppHelper;
 use App\Helpers\CommonHelper;
 use App\Model\Model;
 use Carbon\Carbon;
+use Hyperf\DbConnection\Db;
 
 /**
  * @property int $id 
@@ -109,15 +111,35 @@ class Group extends Model
     protected function createGroup($account_id, $name, $cover, $type = self::TYPE_PUBLIC): int
     {
         $ident = RoomTypeInterface::ROOM_TYPE_GROUP . CommonHelper::generateUniqid();
-        return $this->insertGetId([
-            'account_id' => $account_id,
-            'authorization_id' => AppHelper::getAuthorizationId(),
-            'ident' => $ident,
-            'name' => $name,
-            'cover' => $cover,
-            'type' => $type,
-            'created_at' => Carbon::now(),
-        ]);
+
+        Db::beginTransaction();
+
+        try {
+            $group_id = $this->insertGetId([
+                'account_id' => $account_id,
+                'authorization_id' => AppHelper::getAuthorizationId(),
+                'ident' => $ident,
+                'name' => $name,
+                'cover' => $cover,
+                'type' => $type,
+                'created_at' => Carbon::now(),
+            ]);
+
+            if (! $group_id) {
+                throw new Exception('Failed to create group chat');
+            }
+
+            // 将用户账号作为群主加入到群内
+            if (GroupAccount::bindGroupAccountRelation($account_id, $group_id, GroupAccount::IDENTITY_HOST)) {
+                Db::commit();
+            }
+
+            return $group_id;
+        } catch (Exception $e) {
+            Db::rollBack();
+        }
+
+        return 0;
     }
 
     /**
