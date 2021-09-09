@@ -50,7 +50,7 @@ Router::addGroup('/group', function () {
     Router::get('/{group_id}/info', 'App\Controller\Http\GroupController@info');
     // 修改群信息
     Router::post('/{account_id}/update', 'App\Controller\Http\GroupController@update');
-    // 删除群聊
+    // 解散群聊
     Router::delete('/{group_id}/delete', 'App\Controller\Http\GroupController@delete');
 
     // 申请加入群聊

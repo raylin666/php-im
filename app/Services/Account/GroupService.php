@@ -88,20 +88,33 @@ class GroupService extends Service
         return $this->response()->success(Group::builderGroupInfo($group));
     }
 
+    /**
+     * 解散群聊
+     * @param $group_id
+     * @param $account_id
+     * @return array|mixed|void
+     */
     public function delete($group_id, $account_id)
     {
         $this->verifyAccountOrGet($account_id);
 
         // 判断是否有权限操作
-        if (! GroupAccount::isGroupAccountIdentityHostOrAdmin($account_id, $group_id)) {
+        if (! GroupAccount::isGroupAccountIdentityHost($account_id, $group_id)) {
             return $this->response()->error(HttpErrorCode::GROUP_ACCOUNT_NOT_OPERATED_AUTH);
         }
 
-        // 判断是否该用户群 并且群聊是否可用
+        // 判断群聊是否可用
+        if (! Group::getGroupId($group_id)) {
+            return $this->response()->error(HttpErrorCode::GROUP_NOT_EXIST);
+        }
 
         // 移除所有群内成员
+        GroupAccount::removeAllGroupAccount($group_id);
 
         // 删除群组
+        Group::deleteGroup($group_id);
+
+        return $this->response()->success();
     }
 
     /**
@@ -209,6 +222,32 @@ class GroupService extends Service
         if ($apply = GroupAccountApply::getBeConfirm($from_account_id, $group_id)) {
             GroupAccountApply::rejectedGroupAccountApply($apply['id'], $operated_account_id);
         }
+
+        return $this->response()->success();
+    }
+
+    /**
+     * 退出群聊
+     * @param $account_id
+     * @param $group_id
+     * @return array|mixed|void
+     */
+    public function quit($account_id, $group_id)
+    {
+        $this->verifyAccountOrGet($account_id);
+
+        // 判断用户是否在群内
+        if (! GroupAccount::isGroupAccount($account_id, $group_id)) {
+            return $this->response()->error(HttpErrorCode::GROUP_ACCOUNT_NOT_EXIST);
+        }
+
+        // 判断用户是否群主,不允许退群
+        if (! GroupAccount::isGroupAccountIdentityHost($account_id, $group_id)) {
+            return $this->response()->error(HttpErrorCode::GROUP_ACCOUNT_IS_HOST_NOT_QUIT);
+        }
+
+        // 退群操作
+        GroupAccount::unbindGroupAccountRelation($account_id, $group_id);
 
         return $this->response()->success();
     }

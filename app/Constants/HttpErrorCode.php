@@ -414,4 +414,14 @@ class HttpErrorCode extends AbstractConstants
      * @Message("您没有操作该群权限")
      */
     const GROUP_ACCOUNT_NOT_OPERATED_AUTH = 30007;
+
+    /**
+     * @Message("您不是群成员")
+     */
+    const GROUP_ACCOUNT_NOT_EXIST = 30008;
+
+    /**
+     * @Message("您是群主不能退群, 可以选择解散群组")
+     */
+    const GROUP_ACCOUNT_IS_HOST_NOT_QUIT = 30009;
 }

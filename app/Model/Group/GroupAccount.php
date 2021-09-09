@@ -96,6 +96,45 @@ class GroupAccount extends Model
     }
 
     /**
+     * 群成员是否群主
+     * @param $account_id
+     * @param $group_id
+     * @return bool
+     */
+    protected function isGroupAccountIdentityHost($account_id, $group_id): bool
+    {
+        return $this->where(['account_id' => $account_id, 'group_id' => $group_id, 'identity' => self::IDENTITY_HOST, 'state' => self::STATE_OPEN])
+            ->whereNull('deleted_at')
+            ->exists();
+    }
+
+    /**
+     * 群成员是否管理员
+     * @param $account_id
+     * @param $group_id
+     * @return bool
+     */
+    protected function isGroupAccountIdentityAdmin($account_id, $group_id): bool
+    {
+        return $this->where(['account_id' => $account_id, 'group_id' => $group_id, 'identity' => self::IDENTITY_ADMIN, 'state' => self::STATE_OPEN])
+            ->whereNull('deleted_at')
+            ->exists();
+    }
+
+    /**
+     * 群成员是否普通身份
+     * @param $account_id
+     * @param $group_id
+     * @return bool
+     */
+    protected function isGroupAccountIdentityPublic($account_id, $group_id): bool
+    {
+        return $this->where(['account_id' => $account_id, 'group_id' => $group_id, 'identity' => self::IDENTITY_PUBLIC, 'state' => self::STATE_OPEN])
+            ->whereNull('deleted_at')
+            ->exists();
+    }
+
+    /**
      * 群成员绑定
      * @param     $account_id
      * @param     $group_id
@@ -128,5 +167,33 @@ class GroupAccount extends Model
         );
 
         return true;
+    }
+
+    /**
+     * 解除群成员绑定
+     * @param $account_id
+     * @param $group_id
+     * @return bool
+     */
+    protected function unbindGroupAccountRelation($account_id, $group_id): bool
+    {
+        $this->where(['account_id' => $account_id, 'group_id' => $group_id])
+            ->update([
+                'state' => self::STATE_DELETE,
+                'deleted_at' => Carbon::now(),
+            ]);
+    }
+
+    /**
+     * 移除群聊所有成员
+     * @param $group_id
+     */
+    protected function removeAllGroupAccount($group_id)
+    {
+        $this->where(['group_id' => $group_id, 'state' => self::STATE_OPEN])
+            ->update([
+                'state' => self::STATE_DELETE,
+                'deleted_at' => Carbon::now(),
+            ]);
     }
 }

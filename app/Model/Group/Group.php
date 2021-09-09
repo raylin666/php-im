@@ -158,6 +158,18 @@ class Group extends Model
     }
 
     /**
+     * 删除群组
+     * @param $id
+     */
+    protected function deleteGroup($id)
+    {
+        $this->where(['id' => $id])->update([
+            'state' => self::STATE_DELETE,
+            'deleted_at' => Carbon::now(),
+        ]);
+    }
+
+    /**
      * @param Group $group
      * @return array
      */

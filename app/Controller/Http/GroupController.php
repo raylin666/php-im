@@ -16,6 +16,7 @@ use App\Request\Group\ApplyRequest;
 use App\Request\Group\CreateRequest;
 use App\Request\Group\DeleteRequest;
 use App\Request\Group\PassedRequest;
+use App\Request\Group\QuitRequest;
 use App\Request\Group\RejectedRequest;
 use App\Request\Group\UpdateRequest;
 use App\Services\Account\GroupService;
@@ -69,7 +70,7 @@ class GroupController extends AbstractController
     }
 
     /**
-     * 删除群聊
+     * 解散群聊
      * @param DeleteRequest $request
      * @param               $group_id
      * @return mixed
@@ -125,6 +126,21 @@ class GroupController extends AbstractController
 
         return $this->response->RESTfulAPI(
             GroupService::getInstance()->rejected($group_id, $data['from_account_id'], $data['operated_account_id'])
+        );
+    }
+
+    /**
+     * 退出群聊
+     * @param QuitRequest $request
+     * @param             $account_id
+     * @return mixed
+     */
+    public function quit(QuitRequest $request, $account_id)
+    {
+        $data = $request->validated();
+
+        return $this->response->RESTfulAPI(
+            GroupService::getInstance()->quit($account_id, $data['group_id'])
         );
     }
 }
