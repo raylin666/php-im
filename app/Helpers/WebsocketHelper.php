@@ -68,83 +68,6 @@ class WebsocketHelper extends Helper
     }
 
     /**
-     * 构造消息体
-     * @param string $messageType
-     * @param array  $messageData
-     * @return MessageDefinitionInterface|null
-     */
-    protected function builderMessage(string $messageType, array $messageData): ?MessageDefinitionInterface
-    {
-        /** @var BuilderMessageInterface $builderMessage */
-        switch ($messageType) {
-            case MessageStruct::MESSAGE_TYPE_TEXT:
-                $builderMessage = AppHelper::getContainer()->make(
-                    BuilderTextMessage::class,
-                    [
-                        $messageData[TextMessage::MESSAGE_DATA_CONTENT] ?? ''
-                    ]
-                );
-                break;
-            case MessageStruct::MESSAGE_ENTER_GROUP:
-                $builderMessage = AppHelper::getContainer()->make(
-                    BuilderEnterGroupMessage::class,
-                    [
-                        intval($messageData[EnterGroupMessage::MESSAGE_ENTER_ACCOUNT_ID] ?? 0)
-                    ]
-                );
-                break;
-            case MessageStruct::MESSAGE_QUIT_GROUP:
-                $builderMessage = AppHelper::getContainer()->make(
-                    BuilderQuitGroupMessage::class,
-                    [
-                        intval($messageData[QuitGroupMessage::MESSAGE_QUIT_ACCOUNT_ID] ?? 0)
-                    ]
-                );
-                break;
-            case MessageStruct::MESSAGE_JOIN_GROUP:
-                $builderMessage = AppHelper::getContainer()->make(
-                    BuilderJoinGroupMessage::class,
-                    [
-                        intval($messageData[JoinGroupMessage::MESSAGE_JOIN_ACCOUNT_ID] ?? 0)
-                    ]
-                );
-                break;
-            case MessageStruct::MESSAGE_EXIT_GROUP:
-                $builderMessage = AppHelper::getContainer()->make(
-                    BuilderExitGroupMessage::class,
-                    [
-                        intval($messageData[ExitGroupMessage::MESSAGE_EXIT_ACCOUNT_ID] ?? 0)
-                    ]
-                );
-                break;
-            default:
-                return null;
-        }
-
-        return $builderMessage->get();
-    }
-
-    /**
-     * 构建发送消息内容, 单个用户账号对应多个 fd
-     * @param                            $account_id
-     * @param MessageDefinitionInterface $message
-     * @return array
-     */
-    protected function builderPushMessage($account_id, MessageDefinitionInterface $message): array
-    {
-        $call_message = [];
-        $fds = $this->getAccountAuthorizationFd($account_id);
-        foreach ($fds as $fd) {
-            $builder_push_message = AppHelper::getContainer()->get(BuilderPushMessage::class);
-            $call_message[] = $builder_push_message
-                ->withFd($fd)
-                ->withMessage($message);
-        }
-
-        return $call_message;
-    }
-
-    /**
      * 消息处理
      * @param $fd
      * @param $data
@@ -335,46 +258,80 @@ class WebsocketHelper extends Helper
     }
 
     /**
-     * 保存消息
-     * @param MessageDefinitionInterface $messageDefinition
-     * @param                            $accountId
-     * @param                            $toAccountId
-     * @param Carbon|null                $messageSendAt
-     * @param bool                       $isSystemMessage
+     * 构造消息体
+     * @param string $messageType
+     * @param array  $messageData
+     * @return MessageDefinitionInterface|null
      */
-    protected function saveMessage(
-        MessageDefinitionInterface $messageDefinition,
-        $accountId,
-        $toAccountId,
-        ?Carbon $messageSendAt,
-        bool $isSystemMessage = false
-    )
+    protected function builderMessage(string $messageType, array $messageData): ?MessageDefinitionInterface
     {
-        $messageDefinition->toArray();
-        /** @var Message $messageDefinition */
-        AppHelper::getGo(function () use (
-            $messageDefinition,
-            $accountId,
-            $toAccountId,
-            $messageSendAt,
-            $isSystemMessage
-        ) {
-            // 发送消息给对方(单聊/群聊)
-            switch ($messageDefinition->getMessageStruct()->getRoomType()) {
-                case RoomTypeInterface::ROOM_TYPE_C2C:
-                    C2cMessage::addMessage(
-                        $accountId,
-                        $toAccountId,
-                        $messageDefinition->getMessageStruct()->getMessageType(),
-                        json_encode($messageDefinition->getMessageStruct()->getMessageData()),
-                        $messageSendAt ?: Carbon::now(),
-                        $isSystemMessage
-                    );
-                    break;
-                case RoomTypeInterface::ROOM_TYPE_GROUP:
-                    break;
-            }
-        });
+        /** @var BuilderMessageInterface $builderMessage */
+        switch ($messageType) {
+            case MessageStruct::MESSAGE_TYPE_TEXT:
+                $builderMessage = AppHelper::getContainer()->make(
+                    BuilderTextMessage::class,
+                    [
+                        $messageData[TextMessage::MESSAGE_DATA_CONTENT] ?? ''
+                    ]
+                );
+                break;
+            case MessageStruct::MESSAGE_ENTER_GROUP:
+                $builderMessage = AppHelper::getContainer()->make(
+                    BuilderEnterGroupMessage::class,
+                    [
+                        intval($messageData[EnterGroupMessage::MESSAGE_ENTER_ACCOUNT_ID] ?? 0)
+                    ]
+                );
+                break;
+            case MessageStruct::MESSAGE_QUIT_GROUP:
+                $builderMessage = AppHelper::getContainer()->make(
+                    BuilderQuitGroupMessage::class,
+                    [
+                        intval($messageData[QuitGroupMessage::MESSAGE_QUIT_ACCOUNT_ID] ?? 0)
+                    ]
+                );
+                break;
+            case MessageStruct::MESSAGE_JOIN_GROUP:
+                $builderMessage = AppHelper::getContainer()->make(
+                    BuilderJoinGroupMessage::class,
+                    [
+                        intval($messageData[JoinGroupMessage::MESSAGE_JOIN_ACCOUNT_ID] ?? 0)
+                    ]
+                );
+                break;
+            case MessageStruct::MESSAGE_EXIT_GROUP:
+                $builderMessage = AppHelper::getContainer()->make(
+                    BuilderExitGroupMessage::class,
+                    [
+                        intval($messageData[ExitGroupMessage::MESSAGE_EXIT_ACCOUNT_ID] ?? 0)
+                    ]
+                );
+                break;
+            default:
+                return null;
+        }
+
+        return $builderMessage->get();
+    }
+
+    /**
+     * 构建发送消息内容, 单个用户账号对应多个 fd
+     * @param                            $account_id
+     * @param MessageDefinitionInterface $message
+     * @return array
+     */
+    protected function builderPushMessage($account_id, MessageDefinitionInterface $message): array
+    {
+        $call_message = [];
+        $fds = $this->getAccountAuthorizationFd($account_id);
+        foreach ($fds as $fd) {
+            $builder_push_message = AppHelper::getContainer()->get(BuilderPushMessage::class);
+            $call_message[] = $builder_push_message
+                ->withFd($fd)
+                ->withMessage($message);
+        }
+
+        return $call_message;
     }
 
     /**
@@ -404,5 +361,48 @@ class WebsocketHelper extends Helper
             $server->push($fd, $push_message->toJson());
             if ($isClose) $server->close($fd);
         }, $fd, $definition, $code, $message, $isClose);
+    }
+
+    /**
+     * 保存消息
+     * @param MessageDefinitionInterface $messageDefinition
+     * @param                            $accountId
+     * @param                            $toAccountId
+     * @param Carbon|null                $messageSendAt
+     * @param bool                       $isSystemMessage
+     */
+    protected function saveMessage(
+        MessageDefinitionInterface $messageDefinition,
+                                   $accountId,
+                                   $toAccountId,
+        ?Carbon $messageSendAt,
+        bool $isSystemMessage = false
+    )
+    {
+        $messageDefinition->toArray();
+        /** @var Message $messageDefinition */
+        AppHelper::getGo(function () use (
+            $messageDefinition,
+            $accountId,
+            $toAccountId,
+            $messageSendAt,
+            $isSystemMessage
+        ) {
+            // 发送消息给对方(单聊/群聊)
+            switch ($messageDefinition->getMessageStruct()->getRoomType()) {
+                case RoomTypeInterface::ROOM_TYPE_C2C:
+                    C2cMessage::addMessage(
+                        $accountId,
+                        $toAccountId,
+                        $messageDefinition->getMessageStruct()->getMessageType(),
+                        json_encode($messageDefinition->getMessageStruct()->getMessageData()),
+                        $messageSendAt ?: Carbon::now(),
+                        $isSystemMessage
+                    );
+                    break;
+                case RoomTypeInterface::ROOM_TYPE_GROUP:
+                    break;
+            }
+        });
     }
 }
