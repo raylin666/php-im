@@ -20,6 +20,7 @@ use App\Request\Group\QuitRequest;
 use App\Request\Group\RejectedRequest;
 use App\Request\Group\UpdateRequest;
 use App\Services\Account\GroupService;
+use Hyperf\HttpServer\Contract\RequestInterface;
 
 /**
  * 群聊模块
@@ -51,6 +52,22 @@ class GroupController extends AbstractController
     {
         return $this->response->RESTfulAPI(
             GroupService::getInstance()->info($group_id)
+        );
+    }
+
+    /**
+     * 获取群成员列表
+     * @param RequestInterface $request
+     * @param                  $group_id
+     * @return mixed
+     */
+    public function accountList(RequestInterface $request, $group_id)
+    {
+        $page = intval($request->input('page', 1));
+        $size = intval($request->input('size', 30));
+
+        return $this->response->RESTfulAPI(
+            GroupService::getInstance()->accountList($group_id, $page, $size)
         );
     }
 

@@ -99,6 +99,6 @@ GOTO_VALID_RESULT:
             ->bind($fd);
 
         // 设置用户在线状态
-        AccountAuthorization::setOnline($account_id, $authorization_id);
+        AccountAuthorization::setOnline($account_id);
     }
 }

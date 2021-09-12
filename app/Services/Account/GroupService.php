@@ -11,6 +11,7 @@ declare(strict_types=1);
  */
 namespace App\Services\Account;
 
+use App\Model\Account\AccountAuthorization;
 use Exception;
 use App\Constants\HttpErrorCode;
 use App\Model\Account\Account;
@@ -58,6 +59,28 @@ class GroupService extends Service
         }
 
         return $this->response()->success(Group::builderGroupInfo($group));
+    }
+
+    /**
+     * 获取群成员列表
+     * @param     $group_id
+     * @param int $page
+     * @param int $size
+     * @return array|mixed|void
+     */
+    public function accountList($group_id, $page = 1, $size = 30)
+    {
+        if (! Group::getGroupInfo($group_id)) {
+            return $this->response()->error(HttpErrorCode::GROUP_NOT_EXIST);
+        }
+
+        $list = GroupAccount::getAccountList($group_id, $page, $size);
+        foreach ($list as &$item) {
+            // 判断群成员是否在线
+            $item['is_online'] = AccountAuthorization::isOnline($item['account_id']);
+        }
+
+        return $this->response()->success($list);
     }
 
     /**

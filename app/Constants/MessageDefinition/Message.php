@@ -36,32 +36,6 @@ abstract class Message implements MessageDefinitionInterface
     }
 
     /**
-     * @param int    $messageId
-     * @param string $roomType
-     * @param int    $roomId
-     * @param int    $fromAccountId
-     * @param int    $toAccountId
-     * @return MessageInterface
-     */
-    public function withBasicMessage(
-        int $messageId,
-        string $roomType,
-        int $roomId = 0,
-        int $fromAccountId = 0,
-        int $toAccountId = 0
-    ): self
-    {
-        $this->getMessageStruct()
-            ->withRoomType($roomType)
-            ->withRoomId($roomId)
-            ->withFromAccountId($fromAccountId)
-            ->withToAccountId($toAccountId)
-            ->withMessageId($messageId);
-
-        return $this;
-    }
-
-    /**
      * @return array
      */
     public function toArray(): array

@@ -38,12 +38,12 @@ class JoinGroupMessage extends Message
 
     /**
      * 设置加入群用户账号
-     * @param  $joinAccountId
+     * @param int $joinAccountId
      * @return $this
      */
-    protected function withJoinAccountId($joinAccountId): self
+    protected function withJoinAccountId(int $joinAccountId): self
     {
-        $this->joinAccountId = intval($joinAccountId);
+        $this->joinAccountId = $joinAccountId;
         return $this;
     }
 

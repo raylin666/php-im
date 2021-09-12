@@ -38,12 +38,12 @@ class ExitGroupMessage extends Message
 
     /**
      * 设置离开群用户账号
-     * @param  $exitAccountId
+     * @param int $exitAccountId
      * @return $this
      */
-    protected function withExitAccountId($exitAccountId): self
+    protected function withExitAccountId(int $exitAccountId): self
     {
-        $this->exitAccountId = intval($exitAccountId);
+        $this->exitAccountId = $exitAccountId;
         return $this;
     }
 

@@ -38,12 +38,12 @@ class EnterGroupMessage extends Message
 
     /**
      * 设置进入群用户账号
-     * @param  $enterAccountId
+     * @param  int  $enterAccountId
      * @return $this
      */
-    protected function withEnterAccountId($enterAccountId): self
+    protected function withEnterAccountId(int $enterAccountId): self
     {
-        $this->enterAccountId = intval($enterAccountId);
+        $this->enterAccountId = $enterAccountId;
         return $this;
     }
 

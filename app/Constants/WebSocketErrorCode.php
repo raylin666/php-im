@@ -66,6 +66,11 @@ class WebSocketErrorCode extends AbstractConstants
     const WS_TO_ACCOUNT_JOIN_FRIEND_BE_CONFIRM = 10007;
 
     /**
+     * @Message("你们不是好友关系")
+     */
+    const WS_TO_ACCOUNT_NOT_IS_FRIEND = 10008;
+
+    /**
      * @Message("Message data parsing failed")
      */
     const WS_MESSAGE_RESOLVE_ERROR = 20001;

@@ -196,4 +196,19 @@ class GroupAccount extends Model
                 'deleted_at' => Carbon::now(),
             ]);
     }
+
+    /**
+     * 获取群成员列表
+     * @param     $group_id
+     * @param int $page
+     * @param int $size
+     * @return \Hyperf\Contract\LengthAwarePaginatorInterface
+     */
+    protected function getAccountList($group_id, $page = 1, $size = 30)
+    {
+        $builder = $this->where(['group_id' => $group_id, 'state' => self::STATE_OPEN])
+            ->orderByDesc('identity');
+
+        return $builder->paginate($size, ['*'], 'page', $page);
+    }
 }

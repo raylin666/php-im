@@ -48,6 +48,8 @@ Router::addGroup('/group', function () {
     Router::put('/{account_id}/create', 'App\Controller\Http\GroupController@create');
     // 获取群信息
     Router::get('/{group_id}/info', 'App\Controller\Http\GroupController@info');
+    // 获取群成员列表
+    Router::get('/{group_id}/account/list', 'App\Controller\Http\GroupController@accountList');
     // 修改群信息
     Router::post('/{account_id}/update', 'App\Controller\Http\GroupController@update');
     // 解散群聊
