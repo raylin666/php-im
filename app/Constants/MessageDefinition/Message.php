@@ -24,6 +24,11 @@ abstract class Message implements MessageDefinitionInterface
     protected $messageStruct;
 
     /**
+     * @var bool
+     */
+    protected $isSetMessage = false;
+
+    /**
      * @return MessageInterface
      */
     public function getMessageStruct(): MessageInterface
@@ -36,13 +41,19 @@ abstract class Message implements MessageDefinitionInterface
     }
 
     /**
+     * @param false $forceUpdate
      * @return array
      */
-    public function toArray(): array
+    public function toArray($forceUpdate = false): array
     {
         // TODO: Implement toArray() method.
 
-        $message = $this->toMessage();
+        if ((! $this->isSetMessage) || ($forceUpdate)) {
+            $this->isSetMessage = true;
+            $message = $this->toMessage();
+        } else {
+            $message = $this->messageStruct;
+        }
 
         return [
             MessageStruct::ROOM_TYPE => $message->getRoomType(),

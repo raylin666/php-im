@@ -87,7 +87,7 @@ class WebsocketHelper extends Helper
         // 消息发送时间
         $message_send_at = Carbon::now();
 
-        $message  = $this->resolveMessage($fd, $data);
+        $message = $this->resolveMessage($fd, $data);
 
         if (! $message instanceof Message) return;
 
@@ -195,6 +195,9 @@ class WebsocketHelper extends Helper
 
                 break;
         }
+
+        // 注意（不建议去掉该行代码）: 预设置并得到消息内容体, 防止内部处理忘记 toArray 导致内容数据未设置
+        $message->toArray();
 
         // 发送消息
         /** @var BuilderPushMessageInterface $item_message */
@@ -373,8 +376,8 @@ class WebsocketHelper extends Helper
      */
     protected function saveMessage(
         MessageDefinitionInterface $messageDefinition,
-                                   $accountId,
-                                   $toAccountId,
+        $accountId,
+        $toAccountId,
         ?Carbon $messageSendAt,
         bool $isSystemMessage = false
     )
