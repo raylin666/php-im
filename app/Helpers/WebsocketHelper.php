@@ -33,6 +33,7 @@ use App\Model\Friend\AccountFriend;
 use App\Model\Group\Group;
 use App\Model\Group\GroupAccount;
 use App\Model\Message\C2cMessage;
+use App\Model\Message\GroupMessage;
 use App\Repository\AchieveClass\BuilderPushMessage;
 use App\Repository\AchieveClass\PushMessage;
 use App\Repository\AchieveClass\RoomType;
@@ -59,7 +60,7 @@ class WebsocketHelper extends Helper
     {
         $fds = [];
         foreach (AppHelper::getIMTable()->get() as $row) {
-            if (($row[IMTable::CONLUMN_ACCOUNT_ID] == $account_id) && ($row[IMTable::COLUMN_AUTHORIZATION_ID] == AppHelper::getAccountToken()->getAuthorizationId())) {
+            if (($row[IMTable::CONLUMN_ACCOUNT_ID] == $account_id) && ($row[IMTable::COLUMN_AUTHORIZATION_ID] == AppHelper::getAuthorizationId())) {
                 $fds[] = $row[IMTable::COLUMN_FD];
             }
         }
@@ -133,7 +134,7 @@ class WebsocketHelper extends Helper
         };
 
         // 群聊消息构建
-        $builder_group_message = function ($account_id, $to_account_id) use (
+        $builder_group_message = function ($account_id) use (
             $message,
             $fd,
             &$is_save_message,
@@ -170,6 +171,10 @@ class WebsocketHelper extends Helper
             }
 
             // 获取群所有在线成员 fd 并构建发送消息
+            $group_account_ids = GroupAccount::getAccountIds($group_id);
+            foreach ($group_account_ids as $group_account_id) {
+                $call_message = array_merge($call_message, $this->builderPushMessage($group_account_id, $message));
+            }
 
             return [];
         };
@@ -189,7 +194,7 @@ class WebsocketHelper extends Helper
                 break;
             case RoomTypeInterface::ROOM_TYPE_GROUP:
 
-                $message_builder_result = $builder_group_message($account_id, $to_account_id);
+                $message_builder_result = $builder_group_message($account_id);
 
                 if (! is_array($message_builder_result)) return;
 
@@ -207,7 +212,7 @@ class WebsocketHelper extends Helper
 
         // 保存消息
         if ($is_save_message) {
-            $this->saveMessage($message, $account_id, $to_account_id, $message_send_at, $is_system_message);
+            $this->saveMessage($message, $account_id, $message_send_at, $is_system_message);
         }
     }
 
@@ -368,14 +373,12 @@ class WebsocketHelper extends Helper
      * 保存消息
      * @param MessageDefinitionInterface $messageDefinition
      * @param                            $accountId
-     * @param                            $toAccountId
      * @param Carbon|null                $messageSendAt
      * @param bool                       $isSystemMessage
      */
     protected function saveMessage(
         MessageDefinitionInterface $messageDefinition,
         $accountId,
-        $toAccountId,
         ?Carbon $messageSendAt,
         bool $isSystemMessage = false
     )
@@ -385,7 +388,6 @@ class WebsocketHelper extends Helper
         AppHelper::getGo(function () use (
             $messageDefinition,
             $accountId,
-            $toAccountId,
             $messageSendAt,
             $isSystemMessage
         ) {
@@ -394,7 +396,7 @@ class WebsocketHelper extends Helper
                 case RoomTypeInterface::ROOM_TYPE_C2C:
                     C2cMessage::addMessage(
                         $accountId,
-                        $toAccountId,
+                        $messageDefinition->getMessageStruct()->getToAccountId(),
                         $messageDefinition->getMessageStruct()->getMessageType(),
                         json_encode($messageDefinition->getMessageStruct()->getMessageData()),
                         $messageSendAt ?: Carbon::now(),
@@ -402,6 +404,14 @@ class WebsocketHelper extends Helper
                     );
                     break;
                 case RoomTypeInterface::ROOM_TYPE_GROUP:
+                    GroupMessage::addMessage(
+                        $messageDefinition->getMessageStruct()->getRoomId(),
+                        $messageDefinition->getMessageStruct()->getMessageType(),
+                        json_encode($messageDefinition->getMessageStruct()->getMessageData()),
+                        $accountId,
+                        $messageSendAt ?: Carbon::now(),
+                        $isSystemMessage
+                    );
                     break;
             }
         });

@@ -58,7 +58,7 @@ class C2cMessage extends Model
         $message_content,
         ?Carbon $send_at = null,
         bool $is_system = false
-    )
+    ): int
     {
         return $this->insertGetId([
             'ident' => AccountFriend::getIdent($from_account_id, $to_account_id),

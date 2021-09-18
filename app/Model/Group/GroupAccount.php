@@ -15,7 +15,7 @@ use Carbon\Carbon;
  * @property int $identity 
  * @property int $state 
  * @property \Carbon\Carbon $created_at 
- * @property string $deleted_at 
+ * @property string $deleted_at
  */
 class GroupAccount extends Model
 {
@@ -82,6 +82,19 @@ class GroupAccount extends Model
     }
 
     /**
+     * 获取群成员身份
+     * @param $account_id
+     * @param $group_id
+     * @return int|null
+     */
+    protected function getGroupAccountIdentity($account_id, $group_id): ?int
+    {
+        return $this->where(['account_id' => $account_id, 'group_id' => $group_id, 'state' => self::STATE_OPEN])
+            ->whereNull('deleted_at')
+            ->value('identity');
+    }
+
+    /**
      * 群成员是否群主或管理员
      * @param $account_id
      * @param $group_id
@@ -143,7 +156,7 @@ class GroupAccount extends Model
      */
     protected function bindGroupAccountRelation($account_id, $group_id, $identity = self::IDENTITY_PUBLIC): bool
     {
-        if (! in_array($identity, [
+        if (!in_array($identity, [
             self::IDENTITY_HOST,
             self::IDENTITY_ADMIN,
             self::IDENTITY_PUBLIC
@@ -199,16 +212,27 @@ class GroupAccount extends Model
 
     /**
      * 获取群成员列表
-     * @param     $group_id
-     * @param int $page
-     * @param int $size
-     * @return \Hyperf\Contract\LengthAwarePaginatorInterface
+     * @param $group_id
+     * @return array
      */
-    protected function getAccountList($group_id, $page = 1, $size = 30)
+    protected function getAccountList($group_id): array
     {
-        $builder = $this->where(['group_id' => $group_id, 'state' => self::STATE_OPEN])
-            ->orderByDesc('identity');
+        return $this->where(['group_id' => $group_id, 'state' => self::STATE_OPEN])
+            ->orderByDesc('identity')
+            ->get()
+            ->toArray();
+    }
 
-        return $builder->paginate($size, ['*'], 'page', $page);
+    /**
+     * 获取群成员所有账号 ID
+     * @param $group_id
+     * @return array
+     */
+    protected function getAccountIds($group_id): array
+    {
+        return $this->where(['group_id' => $group_id, 'state' => self::STATE_OPEN])
+            ->orderByDesc('identity')
+            ->pluck('account_id')
+            ->toArray();
     }
 }

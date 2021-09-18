@@ -64,17 +64,15 @@ class GroupService extends Service
     /**
      * 获取群成员列表
      * @param     $group_id
-     * @param int $page
-     * @param int $size
      * @return array|mixed|void
      */
-    public function accountList($group_id, $page = 1, $size = 30)
+    public function accountList($group_id)
     {
         if (! Group::getGroupInfo($group_id)) {
             return $this->response()->error(HttpErrorCode::GROUP_NOT_EXIST);
         }
 
-        $list = GroupAccount::getAccountList($group_id, $page, $size);
+        $list = GroupAccount::getAccountList($group_id);
         foreach ($list as &$item) {
             // 判断群成员是否在线
             $item['is_online'] = AccountAuthorization::isOnline($item['account_id']);

@@ -57,17 +57,13 @@ class GroupController extends AbstractController
 
     /**
      * 获取群成员列表
-     * @param RequestInterface $request
      * @param                  $group_id
      * @return mixed
      */
-    public function accountList(RequestInterface $request, $group_id)
+    public function accountList($group_id)
     {
-        $page = intval($request->input('page', 1));
-        $size = intval($request->input('size', 30));
-
         return $this->response->RESTfulAPI(
-            GroupService::getInstance()->accountList($group_id, $page, $size)
+            GroupService::getInstance()->accountList($group_id)
         );
     }
 

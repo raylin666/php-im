@@ -119,7 +119,7 @@ class AppHelper extends Helper
      */
     protected function getAuthorizationId(): int
     {
-        return intval($this->getServerRequest()->authorization_id);
+        return intval($this->getServerRequest()->authorization_id) ?: $this->getAccountToken()->getAuthorizationId();
     }
 
     /**
