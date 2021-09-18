@@ -35,7 +35,7 @@ CREATE TABLE `im_account_friend_apply` (
  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
  `operated_at` datetime DEFAULT NULL COMMENT '操作时间 (通过或拒绝)',
  PRIMARY KEY (`id`),
- UNIQUE KEY `uk_account_to` (`account_id`,`to_account_id`) USING BTREE
+ KEY `un_account_to` (`account_id`,`to_account_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户账号好友申请表';
 
 CREATE TABLE `im_group` (
@@ -64,7 +64,7 @@ CREATE TABLE `im_group_account_apply` (
     `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `operated_at` datetime DEFAULT NULL COMMENT '操作时间 (通过或拒绝)',
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uk_account_group` (`account_id`,`group_id`) USING BTREE,
+    KEY `un_account_group` (`account_id`,`group_id`) USING BTREE,
     KEY `idx_group` (`group_id`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='群聊成员申请入群表';
 

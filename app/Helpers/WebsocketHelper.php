@@ -328,10 +328,8 @@ class WebsocketHelper extends Helper
         $call_message = [];
         $fds = $this->getAccountAuthorizationFd($account_id);
         foreach ($fds as $fd) {
-            $builder_push_message = AppHelper::getContainer()->get(BuilderPushMessage::class);
-            $call_message[] = $builder_push_message
-                ->withFd($fd)
-                ->withMessage($message);
+            $builder_push_message = AppHelper::getContainer()->make(BuilderPushMessage::class);
+            $call_message[CommonHelper::generateUniqid()] = $builder_push_message->withFd($fd)->withMessage($message);
         }
 
         return $call_message;
