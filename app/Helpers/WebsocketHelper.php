@@ -257,10 +257,17 @@ class WebsocketHelper extends Helper
         /** @var Message $messageDefinition */
         $messageDefinition->getMessageStruct()
             ->withRoomType($roomType)
-            ->withRoomId($roomId)
             ->withFromAccountId($accountId)
-            ->withToAccountId($toAccountId)
             ->withMessageId(0);
+
+        switch ($roomType) {
+            case $roomTypeInstance->getC2C():
+                $messageDefinition->getMessageStruct()->withToAccountId($toAccountId);
+                break;
+            case $roomTypeInstance->getGroup():
+                $messageDefinition->getMessageStruct()->withRoomId($roomId);
+                break;
+        }
 
         return $messageDefinition;
     }

@@ -17,7 +17,7 @@ use App\Contract\MessageInterface;
  * 文本消息类型
  *
  * 请求；
- * {"message_type": "friend_apply", "message_data": {"content": "hello world"}, "room_type": "C2C", "to_account_id": "5"}
+ * {"message_type": "text", "message_data": {"content": "hello world"}, "room_type": "C2C", "to_account_id": "5"}
  *
  * 响应：
  * {
