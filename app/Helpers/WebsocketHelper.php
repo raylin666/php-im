@@ -201,7 +201,10 @@ class WebsocketHelper extends Helper
                 break;
         }
 
-        // 注意（不建议去掉该行代码）: 预设置并得到消息内容体, 防止内部处理忘记 toArray 导致内容数据未设置
+        /**
+         * 注意（不建议去掉该行代码）
+         *      预设置并得到消息内容体, 防止内部处理忘记 toArray 导致内容数据未设置
+         */
         $message->toArray();
 
         // 发送消息
